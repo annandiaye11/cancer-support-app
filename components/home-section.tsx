@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ChevronLeft, ChevronRight, CheckCircle2, Circle } from "lucide-react"
+import { CheckCircle2, Circle } from "lucide-react"
 import { useState } from "react"
 
 interface HomeSectionProps {
@@ -86,50 +86,38 @@ export function HomeSection({ userProfile }: HomeSectionProps) {
 
   return (
     <div className="space-y-6 pb-20 md:pb-6">
-      {/* Calendar Section */}
-      <Card className="p-5">
+      {/* Today's Date Display */}
+      <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">Calendrier de dépistage</h3>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={previousMonth}>
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <span className="text-sm font-medium text-foreground min-w-[120px] text-center">
-              {currentMonth.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
-            </span>
-            <Button variant="ghost" size="icon" onClick={nextMonth}>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full bg-linear-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/30 flex items-center justify-center group hover:scale-105 transition-all duration-300">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-primary-foreground">
+                    {new Date().getDate()}
+                  </div>
+                  <div className="text-xs text-primary-foreground/80 font-medium -mt-1">
+                    {new Date().toLocaleDateString("fr-FR", { month: "short" })}
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                <div className="w-2 h-2 bg-accent-foreground rounded-full animate-pulse"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 mb-3">
-          {["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((day) => (
-            <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7 gap-2">
-          {Array.from({ length: startingDayOfWeek }).map((_, i) => (
-            <div key={`empty-${i}`} />
-          ))}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1
-            const isToday =
-              new Date().getDate() === day && new Date().getMonth() === month && new Date().getFullYear() === year
-            return (
-              <div
-                key={day}
-                className={`aspect-square flex items-center justify-center rounded-lg text-sm ${
-                  isToday ? "bg-primary text-primary-foreground font-semibold" : "text-foreground hover:bg-muted"
-                }`}
-              >
-                {day}
-              </div>
-            )
-          })}
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            {new Date().toLocaleDateString("fr-FR", { 
+              weekday: "long", 
+              day: "numeric", 
+              month: "long", 
+              year: "numeric" 
+            })}
+          </p>
         </div>
 
         {userProfile.gender === "female" && (
@@ -171,9 +159,9 @@ export function HomeSection({ userProfile }: HomeSectionProps) {
           {articles.map((article) => (
             <Card
               key={article.id}
-              className="flex-shrink-0 w-[280px] overflow-hidden hover:shadow-lg transition-shadow cursor-pointer snap-start"
+              className="shrink-0 w-[280px] overflow-hidden hover:shadow-lg transition-shadow cursor-pointer snap-start"
             >
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 relative">
+              <div className="aspect-video bg-linear-to-br from-primary/20 to-accent/20 relative">
                 <img
                   src={article.image || "/placeholder.svg"}
                   alt={article.title}

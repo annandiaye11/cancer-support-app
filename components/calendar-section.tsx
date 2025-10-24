@@ -104,40 +104,42 @@ export function CalendarSection({ userProfile }: CalendarSectionProps) {
       </div>
 
       {/* Calendar Widget */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
+      <Card className="p-4 bg-linear-to-br from-background to-muted/20">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
             {currentDate.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Button
               variant="outline"
-              size="icon"
+              size="sm"
+              className="h-8 w-8 p-0 rounded-full hover:scale-105 transition-all duration-200"
               onClick={() => {
                 const newDate = new Date(currentDate)
                 newDate.setMonth(newDate.getMonth() - 1)
                 setCurrentDate(newDate)
               }}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3" />
             </Button>
             <Button
               variant="outline"
-              size="icon"
+              size="sm"
+              className="h-8 w-8 p-0 rounded-full hover:scale-105 transition-all duration-200"
               onClick={() => {
                 const newDate = new Date(currentDate)
                 newDate.setMonth(newDate.getMonth() + 1)
                 setCurrentDate(newDate)
               }}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3" />
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 text-center">
-          {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
-            <div key={day} className="text-xs font-medium text-muted-foreground py-2">
+        <div className="grid grid-cols-7 gap-2 text-center mb-3">
+          {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day, index) => (
+            <div key={`weekday-${index}`} className="text-xs font-medium text-muted-foreground py-1">
               {day}
             </div>
           ))}
@@ -147,21 +149,35 @@ export function CalendarSection({ userProfile }: CalendarSectionProps) {
             const hasAppointment = [28, 30].includes(day)
             return (
               <button
-                key={i}
-                className={`aspect-square rounded-lg flex items-center justify-center text-sm transition-colors ${
+                key={`calendar-day-${i}`}
+                className={`h-9 w-9 rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-200 mx-auto ${
                   day < 1 || day > 31
-                    ? "text-muted-foreground/30"
+                    ? "text-muted-foreground/30 cursor-default"
                     : isToday
-                      ? "bg-primary text-primary-foreground font-semibold"
+                      ? "bg-linear-to-br from-primary via-primary to-primary/80 text-primary-foreground font-bold shadow-lg shadow-primary/20 scale-105"
                       : hasAppointment
-                        ? "bg-accent/20 text-accent font-medium hover:bg-accent/30"
-                        : "text-foreground hover:bg-muted"
+                        ? "bg-linear-to-br from-accent/30 to-accent/60 text-accent-foreground font-semibold hover:scale-105 hover:shadow-md border border-accent/50"
+                        : "text-foreground hover:bg-linear-to-br hover:from-muted/40 hover:to-muted/70 hover:scale-105"
                 }`}
               >
-                {day > 0 && day <= 31 ? day : ""}
+                {day > 0 && day <= 31 ? (
+                  <span className="transition-transform duration-200">{day}</span>
+                ) : null}
               </button>
             )
           })}
+        </div>
+        
+        {/* Legend */}
+        <div className="flex items-center justify-center gap-4 pt-3 border-t border-border/50">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-linear-to-br from-primary to-primary/80"></div>
+            <span className="text-xs text-muted-foreground">Aujourd'hui</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-linear-to-br from-accent/40 to-accent/60 border border-accent/50"></div>
+            <span className="text-xs text-muted-foreground">Rendez-vous</span>
+          </div>
         </div>
       </Card>
 
