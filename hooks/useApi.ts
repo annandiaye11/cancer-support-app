@@ -410,20 +410,33 @@ export function useVideos(filters: {
 }
 
 // Hook pour récupérer les statistiques de la page d'accueil
-export function useHomeStats(userId?: string) {
+export function useHomeStats(userId?: string, isLoadingUserId?: boolean) {
   const [stats, setStats] = useState<HomeStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Ne pas charger les stats tant que l'userId n'est pas prêt
+    if (isLoadingUserId) {
+      console.log('⏳ useHomeStats - Attente du chargement de userId...')
+      return
+    }
+
+    // Ne pas charger si userId est undefined ou null
+    if (userId === undefined || userId === null) {
+      console.log('⚠️ useHomeStats - userId non défini, skip du chargement')
+      setLoading(false)
+      return
+    }
+
     const fetchStats = async () => {
       try {
         setLoading(true)
         
-        // Appel à l'API réelle
-        const url = userId 
-          ? `/api/stats?userId=${userId}` 
-          : '/api/stats'
+        console.log('📊 useHomeStats - Chargement des stats pour userId:', userId)
+        
+        // Appel à l'API réelle avec userId
+        const url = `/api/stats?userId=${userId}`
         
         const response = await fetch(url)
         
@@ -432,10 +445,11 @@ export function useHomeStats(userId?: string) {
         }
         
         const data = await response.json()
+        console.log('✅ useHomeStats - Stats chargées:', data)
         setStats(data)
         setError(null)
       } catch (err) {
-        console.error('Error fetching stats:', err)
+        console.error('❌ Error fetching stats:', err)
         setError('Erreur lors du chargement des statistiques')
         // Fallback sur les données mock en cas d'erreur
         setStats(mockHomeStats)
@@ -445,7 +459,7 @@ export function useHomeStats(userId?: string) {
     }
 
     fetchStats()
-  }, [userId])
+  }, [userId, isLoadingUserId])
 
   return { stats, loading, error }
 }

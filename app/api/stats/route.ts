@@ -3,7 +3,6 @@ import connectDB from '@/lib/mongodb'
 import Article from '@/models/Article'
 import Video from '@/models/Video'
 import Appointment from '@/models/Appointment'
-import { useUserId } from '@/hooks/use-user-id'
 
 // GET /api/stats - Récupérer les statistiques du dashboard
 export async function GET(request: NextRequest) {
@@ -12,6 +11,8 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
+    
+    console.log('📊 Stats API - userId reçu:', userId)
     
     // Récupérer les statistiques depuis MongoDB
     const [
@@ -24,12 +25,16 @@ export async function GET(request: NextRequest) {
       userId ? Appointment.find({ userId }).lean() : Promise.resolve([])
     ])
     
+    console.log('📊 Stats API - Rendez-vous trouvés pour userId:', userAppointments.length)
+    
     // Calculer les rendez-vous à venir
     const now = new Date()
     const upcomingAppointments = userAppointments.filter(apt => {
       const aptDate = new Date(apt.date)
       return aptDate >= now && apt.status !== 'cancelled' && apt.status !== 'completed'
     }).length
+    
+    console.log('📊 Stats API - Rendez-vous à venir:', upcomingAppointments)
     
     // Calculer les tâches complétées (rendez-vous terminés)
     const completedTasks = userAppointments.filter(apt => 

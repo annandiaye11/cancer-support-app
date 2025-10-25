@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix UserId - Cancer Support App</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .current-id {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .current-id strong {
+            color: #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button.secondary {
+            background: #48bb78;
+        }
+        button.secondary:hover {
+            background: #38a169;
+        }
+        button.danger {
+            background: #f56565;
+        }
+        button.danger:hover {
+            background: #e53e3e;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .info {
+            background: #bee3f8;
+            color: #2c5282;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        code {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔧 Fix UserId</h1>
+        <p class="subtitle">Utilitaire pour corriger le problème des rendez-vous</p>
+
+        <div class="current-id">
+            <strong>UserId actuel:</strong><br>
+            <code id="currentUserId">Chargement...</code>
+        </div>
+
+        <div class="info">
+            <strong>ℹ️ Pourquoi ce correctif ?</strong><br>
+            Vos rendez-vous ont été migrés vers l'userId: <code>user-default-dev</code><br>
+            Cliquez sur "Fixer l'userId" pour voir vos rendez-vous dans le dashboard.
+        </div>
+
+        <div class="actions">
+            <button onclick="fixUserId()">🔧 Fixer l'userId</button>
+            <button class="secondary" onclick="checkStats()">📊 Voir les stats</button>
+            <button class="danger" onclick="clearAndReload()">🗑️ Tout effacer</button>
+        </div>
+
+        <div class="success" id="successMessage">
+            ✅ UserId mis à jour ! Rechargez la page principale pour voir vos rendez-vous.
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            <h3>🛠️ Autres actions</h3>
+            <p style="color: #718096; font-size: 14px;">Pour les développeurs</p>
+            <button onclick="showAllAppointments()">📋 Voir tous les RDV</button>
+            <button onclick="openMainApp()">🏠 Ouvrir l'app</button>
+        </div>
+    </div>
+
+    <script>
+        const FIXED_USER_ID = 'user-default-dev';
+
+        // Afficher l'userId actuel
+        function updateCurrentUserId() {
+            const userId = localStorage.getItem('userId');
+            document.getElementById('currentUserId').textContent = userId || 'Aucun';
+        }
+
+        // Fixer l'userId
+        function fixUserId() {
+            localStorage.setItem('userId', FIXED_USER_ID);
+            updateCurrentUserId();
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                if (confirm('UserId fixé ! Voulez-vous ouvrir l\'application ?')) {
+                    window.location.href = '/';
+                }
+            }, 1000);
+        }
+
+        // Voir les statistiques
+        async function checkStats() {
+            const userId = localStorage.getItem('userId') || FIXED_USER_ID;
+            try {
+                const response = await fetch(`/api/stats?userId=${userId}`);
+                const stats = await response.json();
+                alert(
+                    `📊 Statistiques pour ${userId}:\n\n` +
+                    `📝 Articles: ${stats.totalArticles}\n` +
+                    `🎥 Vidéos: ${stats.totalVideos}\n` +
+                    `📅 RDV à venir: ${stats.upcomingAppointments}\n` +
+                    `✅ Tâches complétées: ${stats.completedTasks}`
+                );
+            } catch (error) {
+                alert('❌ Erreur lors de la récupération des stats');
+            }
+        }
+
+        // Voir tous les rendez-vous
+        async function showAllAppointments() {
+            const userId = localStorage.getItem('userId') || FIXED_USER_ID;
+            try {
+                const response = await fetch(`/api/appointments?userId=${userId}`);
+                const data = await response.json();
+                console.log('📅 Rendez-vous:', data);
+                alert(
+                    `📅 Rendez-vous pour ${userId}:\n\n` +
+                    `Total: ${data.pagination.total}\n\n` +
+                    data.appointments.map(apt => 
+                        `• ${apt.title} - ${new Date(apt.date).toLocaleDateString('fr-FR')}`
+                    ).join('\n')
+                );
+            } catch (error) {
+                alert('❌ Erreur lors de la récupération des rendez-vous');
+            }
+        }
+
+        // Tout effacer
+        function clearAndReload() {
+            if (confirm('⚠️ Cela va effacer l\'userId local. Continuer ?')) {
+                localStorage.clear();
+                alert('✅ localStorage effacé ! La page va se recharger.');
+                location.reload();
+            }
+        }
+
+        // Ouvrir l'app principale
+        function openMainApp() {
+            window.location.href = '/';
+        }
+
+        // Initialisation
+        updateCurrentUserId();
+    </script>
+</body>
+</html>

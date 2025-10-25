@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle2, Circle, ChevronRight, Clock, TrendingUp, Book, Calendar, Target } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useHomeStats, useArticles } from "@/hooks/useApi"
 import { useUserId } from "@/hooks/use-user-id"
 
@@ -28,10 +28,18 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
   const [completedScreenings, setCompletedScreenings] = useState<Record<string, boolean>>({})
 
   // Récupérer l'ID utilisateur
-  const { userId } = useUserId()
+  const { userId, isLoading: isLoadingUserId } = useUserId()
+
+  // Log pour déboguer le userId
+  useEffect(() => {
+    if (userId) {
+      console.log('🆔 Home Section - userId actuel:', userId)
+    }
+  }, [userId])
 
   // Utiliser les hooks API pour récupérer les vraies données
-  const { stats, loading: statsLoading } = useHomeStats(userId || undefined)
+  // On passe isLoadingUserId pour éviter de charger les stats avant que userId soit prêt
+  const { stats, loading: statsLoading } = useHomeStats(userId || undefined, isLoadingUserId)
   const { articles: allArticles, loading: articlesLoading } = useArticles({ limit: 6 })
   
   // Filtrer les articles recommandés selon le profil utilisateur
