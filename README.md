@@ -1,13 +1,17 @@
-# 🎗️ CareCompanion - Application de Support contre le Cancer
+# 💜 Kaëra - Ensemble face au cancer
 
 <div align="center">
+  
+  ![Logo Kaëra](public/kaera-logo.png)
   
   ![Octobre Rose](https://img.shields.io/badge/Octobre%20Rose-2025-FF69B4?style=for-the-badge)
   ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
   ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
   ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?style=for-the-badge&logo=mongodb)
   
-  **Une plateforme complète de prévention et d'accompagnement dans la lutte contre le cancer**
+  **Votre compagnon de santé personnalisé contre le cancer**
+  
+  *Accompagnement • Prévention • Soutien psychologique 24/7*
   
   [🎯 Démo](#démo) • [✨ Fonctionnalités](#fonctionnalités) • [🚀 Installation](#installation) • [📖 Documentation](#documentation)
 

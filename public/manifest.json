@@ -1,21 +1,21 @@
 {
-  "name": "CareCompanion - Support Cancer",
-  "short_name": "CareCompanion",
-  "description": "Application de prévention et d'accompagnement contre le cancer",
+  "name": "Kaëra - Ensemble face au cancer",
+  "short_name": "Kaëra",
+  "description": "Votre compagnon de santé personnalisé contre le cancer. Accompagnement, prévention et soutien psychologique 24/7.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#8b5cf6",
+  "theme_color": "#9333ea",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/kaera-logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/kaera-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

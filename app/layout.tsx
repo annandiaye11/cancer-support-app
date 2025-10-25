@@ -8,14 +8,14 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "CareCompanion - Prévention et Accompagnement Cancer",
-  description: "Application de prévention et d'accompagnement contre le cancer",
+  title: "Kaëra - Ensemble face au cancer",
+  description: "Votre compagnon de santé personnalisé contre le cancer. Accompagnement, prévention et soutien psychologique 24/7.",
   generator: "v0.app",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "CareCompanion",
+    title: "Kaëra",
   },
 }
 

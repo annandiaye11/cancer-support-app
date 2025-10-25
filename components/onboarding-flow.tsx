@@ -79,11 +79,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#212E53] via-slate-100 to-sky-50 dark:from-[#212E53] dark:via-slate-900 dark:to-sky-950/20 p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-[#212E53] to-sky-500 mb-4 shadow-lg">
-            <Heart className="w-8 h-8 text-white" />
+          <div className="mb-4 flex justify-center">
+            <img src="/kaera-logo.png" alt="Kaëra" className="h-24 w-auto" />
           </div>
-          <h1 className="text-4xl font-bold bg-linear-to-r from-[#212E53] to-sky-600 bg-clip-text text-transparent mb-2">CareCompanion</h1>
-          <p className="text-muted-foreground text-lg">Votre allié dans la prévention et l'accompagnement</p>
+          <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-2">Kaëra</h1>
+          <p className="text-muted-foreground text-lg">Ensemble face au cancer</p>
         </div>
 
         {step === 1 && (
