@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, Plus, MapPin, Clock, User, Phone, FileText, Trash2, Edit, CheckCircle2, XCircle, AlertCircle } from "lucide-react"
 import { format, isAfter, isBefore, parseISO, addDays } from "date-fns"
 import { fr } from "date-fns/locale"
+import { useUserId } from "@/hooks/use-user-id"
 
 interface Appointment {
   _id?: string
@@ -44,10 +45,12 @@ interface AppointmentsSectionProps {
 }
 
 export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
+  const { userId, isLoading: isLoadingUserId } = useUserId()
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming")
+  const [isLoading, setIsLoading] = useState(false)
   
   const [formData, setFormData] = useState<Appointment>({
     title: "",
@@ -71,40 +74,92 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
     notes: ""
   })
 
-  // Charger les rendez-vous depuis localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("appointments")
-    if (stored) {
-      setAppointments(JSON.parse(stored))
+  // Charger les rendez-vous depuis l'API
+  const fetchAppointments = async () => {
+    if (!userId) return
+    
+    try {
+      setIsLoading(true)
+      const response = await fetch(`/api/appointments?userId=${userId}`)
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement des rendez-vous')
+      }
+      
+      const data = await response.json()
+      setAppointments(data.appointments || [])
+    } catch (error) {
+      console.error('Erreur:', error)
+      // Afficher un message d'erreur à l'utilisateur
+      alert('Impossible de charger les rendez-vous')
+    } finally {
+      setIsLoading(false)
     }
-  }, [])
-
-  // Sauvegarder dans localStorage
-  const saveAppointments = (appts: Appointment[]) => {
-    setAppointments(appts)
-    localStorage.setItem("appointments", JSON.stringify(appts))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (userId && !isLoadingUserId) {
+      fetchAppointments()
+    }
+  }, [userId, isLoadingUserId])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (editingAppointment) {
-      // Modification
-      const updated = appointments.map(apt => 
-        apt._id === editingAppointment._id ? { ...formData, _id: apt._id } : apt
-      )
-      saveAppointments(updated)
-    } else {
-      // Création
-      const newAppointment = {
-        ...formData,
-        _id: Date.now().toString()
+    try {
+      setIsLoading(true)
+      
+      if (editingAppointment) {
+        // Modification
+        const response = await fetch(`/api/appointments?id=${editingAppointment._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...formData,
+            userId
+          }),
+        })
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la modification du rendez-vous')
+        }
+        
+        const updatedAppointment = await response.json()
+        setAppointments(appointments.map(apt => 
+          apt._id === updatedAppointment._id ? updatedAppointment : apt
+        ))
+      } else {
+        // Création
+        const response = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...formData,
+            userId
+          }),
+        })
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la création du rendez-vous')
+        }
+        
+        const newAppointment = await response.json()
+        setAppointments([...appointments, newAppointment])
       }
-      saveAppointments([...appointments, newAppointment])
+      
+      resetForm()
+      setIsDialogOpen(false)
+      alert('Rendez-vous enregistré avec succès!')
+    } catch (error) {
+      console.error('Erreur:', error)
+      alert('Erreur lors de l\'enregistrement du rendez-vous')
+    } finally {
+      setIsLoading(false)
     }
-    
-    resetForm()
-    setIsDialogOpen(false)
   }
 
   const resetForm = () => {
@@ -138,17 +193,58 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce rendez-vous ?")) {
-      saveAppointments(appointments.filter(apt => apt._id !== id))
+  const handleDelete = async (id: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce rendez-vous ?")) {
+      return
+    }
+    
+    try {
+      setIsLoading(true)
+      
+      const response = await fetch(`/api/appointments?id=${id}`, {
+        method: 'DELETE',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression du rendez-vous')
+      }
+      
+      setAppointments(appointments.filter(apt => apt._id !== id))
+      alert('Rendez-vous supprimé avec succès!')
+    } catch (error) {
+      console.error('Erreur:', error)
+      alert('Erreur lors de la suppression du rendez-vous')
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  const handleStatusChange = (id: string, status: Appointment["status"]) => {
-    const updated = appointments.map(apt => 
-      apt._id === id ? { ...apt, status } : apt
-    )
-    saveAppointments(updated)
+  const handleStatusChange = async (id: string, status: Appointment["status"]) => {
+    try {
+      setIsLoading(true)
+      
+      const response = await fetch(`/api/appointments?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour du statut')
+      }
+      
+      const updatedAppointment = await response.json()
+      setAppointments(appointments.map(apt => 
+        apt._id === updatedAppointment._id ? updatedAppointment : apt
+      ))
+    } catch (error) {
+      console.error('Erreur:', error)
+      alert('Erreur lors de la mise à jour du statut')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Filtrer les rendez-vous
@@ -454,8 +550,8 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <Button type="submit" className="flex-1">
-                  {editingAppointment ? "Enregistrer" : "Créer"}
+                <Button type="submit" className="flex-1" disabled={isLoading}>
+                  {isLoading ? "Enregistrement..." : editingAppointment ? "Enregistrer" : "Créer"}
                 </Button>
                 <Button 
                   type="button" 
@@ -464,6 +560,7 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
                     resetForm()
                     setIsDialogOpen(false)
                   }}
+                  disabled={isLoading}
                 >
                   Annuler
                 </Button>
@@ -500,7 +597,14 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
 
       {/* Liste des rendez-vous */}
       <div className="space-y-4">
-        {filteredAppointments.length === 0 ? (
+        {isLoading && appointments.length === 0 ? (
+          <Card className="p-12 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="text-muted-foreground">Chargement des rendez-vous...</p>
+            </div>
+          </Card>
+        ) : filteredAppointments.length === 0 ? (
           <Card className="p-12 text-center">
             <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">

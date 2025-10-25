@@ -6,19 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    turbo: {
-      resolveExtensions: [
-        '.mdx',
-        '.tsx',
-        '.ts',
-        '.jsx',
-        '.js',
-        '.mjs',
-        '.json',
-      ],
-    },
-  },
+  // Configuration Turbopack (silence l'erreur Next.js 16)
+  turbopack: {},
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push('mongoose')
