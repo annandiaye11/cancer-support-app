@@ -49,7 +49,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
 
     const femaleArticles = [
       {
-        id: 2,
+        id: 7,
         title: "Comprendre les différents types de dépistage",
         category: "Dépistage",
         excerpt: "Guide complet des examens recommandés",
@@ -62,7 +62,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
 
     const maleArticles = [
       {
-        id: 2,
+        id: 8,
         title: "Comprendre les différents types de dépistage",
         category: "Dépistage",
         excerpt: "Guide complet des examens recommandés",
