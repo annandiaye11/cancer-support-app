@@ -15,7 +15,6 @@ export function ArticlesSection() {
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
-  const [page, setPage] = useState(1)
 
   // Debounce pour la recherche
   useEffect(() => {
@@ -26,17 +25,11 @@ export function ArticlesSection() {
     return () => clearTimeout(timer)
   }, [searchQuery])
 
-  // Reset page when filters change
-  useEffect(() => {
-    setPage(1)
-  }, [selectedCategory, debouncedSearchQuery])
-
   // Utiliser le vrai hook API avec les filtres
-  const { articles, pagination, loading, error, refetch } = useArticles({
+  const { articles, loading, error } = useArticles({
     ...(selectedCategory && { category: selectedCategory }),
     ...(debouncedSearchQuery && { search: debouncedSearchQuery }),
-    page,
-    limit: 12
+    limit: 50
   })
 
   const filteredArticles = articles || []
@@ -54,19 +47,16 @@ export function ArticlesSection() {
 
   const handleSearch = () => {
     // La recherche se fait automatiquement via le debounce
-    setPage(1)
   }
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId)
-    setPage(1)
   }
 
   if (error) {
     return (
       <div className="text-center py-8">
         <p className="text-red-500">Erreur lors du chargement des articles: {error}</p>
-        <Button onClick={refetch} className="mt-4">Réessayer</Button>
       </div>
     )
   }
@@ -211,43 +201,6 @@ export function ArticlesSection() {
               : "Aucun article disponible pour le moment"
             }
           </p>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
-          <Button
-            variant="outline"
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
-          >
-            Précédent
-          </Button>
-          
-          <div className="flex items-center gap-2">
-            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-              const pageNum = i + 1
-              return (
-                <Button
-                  key={pageNum}
-                  variant={page === pageNum ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setPage(pageNum)}
-                >
-                  {pageNum}
-                </Button>
-              )
-            })}
-          </div>
-          
-          <Button
-            variant="outline"
-            onClick={() => setPage(page + 1)}
-            disabled={page === pagination.totalPages}
-          >
-            Suivant
-          </Button>
         </div>
       )}
     </div>

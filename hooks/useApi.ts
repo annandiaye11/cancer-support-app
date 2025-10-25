@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 // Types pour les données
-interface Article {
+export interface Article {
   _id: string
   title: string
   excerpt: string
@@ -9,6 +9,7 @@ interface Article {
   image: string
   slug: string
   category: string
+  tags?: string[]
   readTime: number
   publishedAt: string
   author: {
