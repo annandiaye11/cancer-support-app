@@ -145,6 +145,10 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
   
   const articles = getRecommendedArticles()
   
+  // Obtenir la clé du mois actuel
+  const today = new Date()
+  const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`
+  
   // Données de démonstration pour les dépistages
   const recommendedScreenings = [
     {
@@ -265,6 +269,111 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
           </Card>
         </div>
       )}
+
+      {/* Calendrier de dépistage */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-foreground">Calendrier de dépistage</h3>
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full bg-linear-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/30 flex items-center justify-center group hover:scale-105 transition-all duration-300">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-primary-foreground">
+                    {new Date().getDate()}
+                  </div>
+                  <div className="text-xs text-primary-foreground/80 font-medium -mt-1">
+                    {new Date().toLocaleDateString("fr-FR", { month: "short" })}
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                <div className="w-2 h-2 bg-accent-foreground rounded-full animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            {new Date().toLocaleDateString("fr-FR", { 
+              weekday: "long", 
+              day: "numeric", 
+              month: "long", 
+              year: "numeric" 
+            })}
+          </p>
+        </div>
+
+        {userProfile.gender === "female" && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id={`screening-${monthKey}`}
+                  checked={screenings[monthKey] || false}
+                  onCheckedChange={() => toggleScreening(monthKey)}
+                />
+                <label htmlFor={`screening-${monthKey}`} className="text-sm font-medium text-foreground cursor-pointer">
+                  Auto-examen des seins ce mois-ci
+                </label>
+              </div>
+              {screenings[monthKey] && <CheckCircle2 className="w-5 h-5 text-primary" />}
+            </div>
+            {userProfile.age >= 25 && (
+              <div className="flex items-center gap-3 mt-3">
+                <Checkbox id="pap-smear" />
+                <label htmlFor="pap-smear" className="text-sm text-muted-foreground cursor-pointer">
+                  Frottis cervical (tous les 3 ans)
+                </label>
+              </div>
+            )}
+            {userProfile.age >= 50 && (
+              <div className="flex items-center gap-3 mt-3">
+                <Checkbox id="colorectal" />
+                <label htmlFor="colorectal" className="text-sm text-muted-foreground cursor-pointer">
+                  Dépistage cancer colorectal (tous les 2 ans)
+                </label>
+              </div>
+            )}
+          </div>
+        )}
+
+        {userProfile.gender === "male" && (
+          <div className="mt-4 pt-4 border-t border-border space-y-3">
+            {userProfile.age >= 50 && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      id={`screening-${monthKey}`}
+                      checked={screenings[monthKey] || false}
+                      onCheckedChange={() => toggleScreening(monthKey)}
+                    />
+                    <label htmlFor={`screening-${monthKey}`} className="text-sm font-medium text-foreground cursor-pointer">
+                      Test PSA prostate (annuel)
+                    </label>
+                  </div>
+                  {screenings[monthKey] && <CheckCircle2 className="w-5 h-5 text-primary" />}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Checkbox id="colorectal-m" />
+                  <label htmlFor="colorectal-m" className="text-sm text-muted-foreground cursor-pointer">
+                    Dépistage cancer colorectal (tous les 2 ans)
+                  </label>
+                </div>
+              </>
+            )}
+            {userProfile.age >= 15 && (
+              <div className="flex items-center gap-3">
+                <Checkbox id="testicular" />
+                <label htmlFor="testicular" className="text-sm text-muted-foreground cursor-pointer">
+                  Auto-examen testiculaire mensuel
+                </label>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
 
       {/* Dépistages recommandés */}
       {recommendedScreenings && recommendedScreenings.length > 0 && (
