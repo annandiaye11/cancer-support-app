@@ -27,14 +27,20 @@ if (!cached) {
 
 async function connectDB(): Promise<typeof mongoose> {
   if (cached?.conn) {
+    console.log('🔄 Utilisation de la connexion MongoDB existante')
     return cached.conn
   }
 
   if (!cached?.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, // 5 secondes timeout
+      socketTimeoutMS: 45000,
     }
 
+    console.log('🔌 Connexion à MongoDB...')
+    console.log('📍 URI:', MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@')) // Cache le password
+    
     if (cached) {
       cached.promise = mongoose.connect(MONGODB_URI, opts)
     }
@@ -42,9 +48,13 @@ async function connectDB(): Promise<typeof mongoose> {
 
   try {
     if (cached?.promise) {
+      const startTime = Date.now()
       cached.conn = await cached.promise
+      const duration = Date.now() - startTime
+      console.log(`✅ MongoDB connecté en ${duration}ms`)
     }
   } catch (e) {
+    console.error('❌ Erreur de connexion MongoDB:', e)
     if (cached) {
       cached.promise = null
     }

@@ -120,7 +120,7 @@ const VideoSchema = new Schema<IVideo>({
 })
 
 // Index pour améliorer les performances
-VideoSchema.index({ slug: 1 })
+// Note: slug a déjà unique: true dans le schema, pas besoin d'index explicite
 VideoSchema.index({ category: 1 })
 VideoSchema.index({ isPublished: 1 })
 VideoSchema.index({ isFeatured: 1 })

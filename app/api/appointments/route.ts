@@ -4,8 +4,12 @@ import Appointment from '@/models/Appointment'
 
 // GET /api/appointments - Récupérer les rendez-vous
 export async function GET(request: NextRequest) {
+  const startTime = Date.now()
   try {
+    console.log('📅 API Appointments - Début de la requête')
+    
     await connectDB()
+    console.log(`⏱️  Connexion DB: ${Date.now() - startTime}ms`)
     
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
@@ -15,6 +19,8 @@ export async function GET(request: NextRequest) {
     const toDate = searchParams.get('toDate')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
+    
+    console.log('📅 Filtres:', { userId, status, type, fromDate, toDate, page, limit })
     
     let query: any = {}
     
@@ -36,12 +42,19 @@ export async function GET(request: NextRequest) {
       if (toDate) query.date.$lte = new Date(toDate)
     }
     
+    const queryStartTime = Date.now()
     const appointments = await Appointment.find(query)
       .sort({ date: 1, time: 1 })
       .limit(limit)
       .skip((page - 1) * limit)
+    console.log(`⏱️  Query find: ${Date.now() - queryStartTime}ms`)
     
+    const countStartTime = Date.now()
     const total = await Appointment.countDocuments(query)
+    console.log(`⏱️  Query count: ${Date.now() - countStartTime}ms`)
+    
+    console.log(`📅 Trouvé ${appointments.length} rendez-vous (total: ${total})`)
+    console.log(`⏱️  Total API: ${Date.now() - startTime}ms`)
     
     return NextResponse.json({
       appointments,
@@ -53,7 +66,8 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error fetching appointments:', error)
+    console.error('❌ Error fetching appointments:', error)
+    console.log(`⏱️  Erreur après: ${Date.now() - startTime}ms`)
     return NextResponse.json(
       { error: 'Erreur lors de la récupération des rendez-vous' },
       { status: 500 }

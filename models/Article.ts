@@ -120,7 +120,7 @@ const ArticleSchema = new Schema<IArticle>({
 })
 
 // Index pour améliorer les performances
-ArticleSchema.index({ slug: 1 })
+// Note: slug a déjà unique: true dans le schema, pas besoin d'index explicite
 ArticleSchema.index({ category: 1 })
 ArticleSchema.index({ isPublished: 1 })
 ArticleSchema.index({ isFeatured: 1 })

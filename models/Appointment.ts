@@ -34,8 +34,8 @@ export interface IAppointment extends Document {
 const AppointmentSchema = new Schema<IAppointment>({
   userId: {
     type: String,  // Changé de ObjectId à String
-    required: true,
-    index: true
+    required: true
+    // index: true retiré car on a un index explicite plus bas
   },
   title: {
     type: String,
