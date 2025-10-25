@@ -55,7 +55,7 @@ const ArticleSchema = new Schema<IArticle>({
   category: {
     type: String,
     required: true,
-    enum: ['Prévention', 'Dépistage', 'Nutrition', 'Traitement', 'Soutien psychologique', 'Témoignages', 'Recherche']
+    enum: ['Prévention', 'Dépistage', 'Nutrition', 'Traitement', 'Soutien psychologique', 'Témoignages', 'Recherche', 'Bien-être', 'Soutien familial']
   },
   tags: [{
     type: String,

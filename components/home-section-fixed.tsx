@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle2, Circle, ChevronRight, Clock, TrendingUp, Book, Calendar, Target } from "lucide-react"
 import { useState } from "react"
-import { useHomeStats, useArticles } from "@/hooks/useApi"
+import { useHomeStats } from "@/hooks/useApi"
 
 interface HomeSectionProps {
   userProfile: {
@@ -26,23 +26,8 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
   })
   const [completedScreenings, setCompletedScreenings] = useState<Record<string, boolean>>({})
 
-  // Utiliser les hooks API pour récupérer les vraies données
+  // Utiliser les hooks API
   const { stats, loading: statsLoading } = useHomeStats()
-  const { articles: allArticles, loading: articlesLoading } = useArticles({ limit: 6 })
-  
-  // Filtrer les articles recommandés selon le profil utilisateur
-  const getRecommendedArticles = () => {
-    if (!allArticles) return []
-    
-    // Prioriser les articles en vedette
-    const featured = allArticles.filter(article => article.isFeatured)
-    const nonFeatured = allArticles.filter(article => !article.isFeatured)
-    
-    // Retourner les premiers articles (featured en premier)
-    return [...featured, ...nonFeatured].slice(0, 4)
-  }
-  
-  const articles = getRecommendedArticles()
   
   // Données de démonstration pour les dépistages
   const recommendedScreenings = [
@@ -60,6 +45,69 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
     }
   ]
   const screeningsLoading = false
+
+  // Articles recommandés selon le genre et le mode
+  const getRecommendedArticles = () => {
+    const commonArticles = [
+      {
+        id: 1,
+        title: "Les aliments anti-cancer à privilégier",
+        category: "Nutrition",
+        excerpt: "Découvrez les aliments riches en antioxydants",
+        image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400",
+        readTime: "8 min",
+        trending: true,
+      },
+      {
+        id: 5,
+        title: "L'importance de l'activité physique",
+        category: "Prévention",
+        excerpt: "Pourquoi bouger régulièrement est essentiel",
+        image: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400",
+        readTime: "7 min",
+        trending: true,
+      },
+    ]
+
+    const femaleArticles = [
+      {
+        id: 2,
+        title: "Auto-examen des seins : guide complet",
+        category: "Prévention",
+        excerpt: "Les gestes essentiels à connaître",
+        image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400",
+        readTime: "6 min",
+        trending: false,
+      },
+      {
+        id: 3,
+        title: "Mammographie : tout ce qu'il faut savoir",
+        category: "Dépistage",
+        excerpt: "Préparation et déroulement de l'examen",
+        image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400",
+        readTime: "5 min",
+        trending: false,
+      },
+    ]
+
+    const maleArticles = [
+      {
+        id: 4,
+        title: "Dépistage du cancer de la prostate",
+        category: "Dépistage",
+        excerpt: "Quand et comment se faire dépister",
+        image: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=400",
+        readTime: "7 min",
+        trending: false,
+      },
+    ]
+
+    if (userProfile.gender === "female") {
+      return [...commonArticles, ...femaleArticles]
+    } else {
+      return [...commonArticles, ...maleArticles]
+    }
+  }
 
   const toggleScreening = (monthKey: string) => {
     setScreenings(prev => ({
@@ -93,7 +141,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
     })
   }
 
-  if (statsLoading || screeningsLoading || articlesLoading) {
+  if (statsLoading || screeningsLoading) {
     return (
       <div className="space-y-6 pb-20 md:pb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -239,11 +287,11 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {articles.slice(0, 4).map((article) => (
+          {getRecommendedArticles().slice(0, 4).map((article) => (
             <div 
-              key={article._id} 
+              key={article.id} 
               className="group cursor-pointer"
-              onClick={() => onArticleClick?.(parseInt(article._id))}
+              onClick={() => onArticleClick?.(article.id)}
             >
               <div className="flex gap-3">
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0">
@@ -252,7 +300,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
-                  {article.isFeatured && (
+                  {article.trending && (
                     <div className="absolute top-1 right-1">
                       <TrendingUp className="w-3 h-3 text-orange-500" />
                     </div>
@@ -265,7 +313,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                   </h4>
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">{article.readTime} min</span>
+                    <span className="text-xs text-muted-foreground">{article.readTime}</span>
                   </div>
                 </div>
               </div>

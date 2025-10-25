@@ -11,6 +11,28 @@ export default function Home() {
     mode: "preventive" | "curative"
     age: number
   } | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Charger les données depuis le localStorage au démarrage
+    const savedProfile = localStorage.getItem('userProfile')
+    const savedOnboarded = localStorage.getItem('isOnboarded')
+    
+    if (savedProfile && savedOnboarded === 'true') {
+      try {
+        const profile = JSON.parse(savedProfile)
+        setUserProfile(profile)
+        setIsOnboarded(true)
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error)
+        // En cas d'erreur, on supprime les données corrompues
+        localStorage.removeItem('userProfile')
+        localStorage.removeItem('isOnboarded')
+      }
+    }
+    
+    setIsLoading(false)
+  }, [])
 
   useEffect(() => {
     if (userProfile) {
@@ -26,6 +48,19 @@ export default function Home() {
   }) => {
     setUserProfile(profile)
     setIsOnboarded(true)
+    
+    // Sauvegarder dans le localStorage
+    localStorage.setItem('userProfile', JSON.stringify(profile))
+    localStorage.setItem('isOnboarded', 'true')
+  }
+
+  // Afficher un loader pendant le chargement initial
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   if (!isOnboarded) {
