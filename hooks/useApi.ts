@@ -105,7 +105,7 @@ const mockArticles: Article[] = [
     readTime: 6,
     publishedAt: "2024-10-18T09:30:00Z",
     author: {
-      name: "Dr. Pierre Martin",
+      name: "Dr. Alioune Badara",
       role: "Médecin préventeur"
     },
     isFeatured: true,
@@ -123,7 +123,7 @@ const mockArticles: Article[] = [
     readTime: 5,
     publishedAt: "2024-10-15T14:20:00Z",
     author: {
-      name: "Sophie Leroy",
+      name: "Aminata Fall",
       role: "Psycho-oncologue"
     },
     isFeatured: false,

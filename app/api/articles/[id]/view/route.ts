@@ -9,7 +9,7 @@ export async function POST(
   try {
     await connectDB()
     
-    const { id } = params
+    const { id } = await params
     
     // Incrémenter le compteur de vues
     const article = await Article.findByIdAndUpdate(

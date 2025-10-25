@@ -485,7 +485,7 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
                       ...formData, 
                       location: { ...formData.location, phone: e.target.value }
                     })}
-                    placeholder="+33 1 23 45 67 89"
+                    placeholder="+221 77 555 78 45"
                   />
                 </div>
               </div>
@@ -506,7 +506,7 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
                         ...formData, 
                         doctor: { ...formData.doctor!, name: e.target.value }
                       })}
-                      placeholder="Dr. Martin"
+                      placeholder="Dr. Moussa"
                     />
                   </div>
                   <div className="space-y-2">
@@ -532,7 +532,7 @@ export function AppointmentsSection({ userProfile }: AppointmentsSectionProps) {
                       ...formData, 
                       doctor: { ...formData.doctor!, phone: e.target.value }
                     })}
-                    placeholder="+33 1 23 45 67 89"
+                    placeholder="+221 77 555 78 45"
                   />
                 </div>
               </div>

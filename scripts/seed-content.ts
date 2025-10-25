@@ -23,7 +23,7 @@ const articles = [
     tags: ["auto-examen", "seins", "prévention", "dépistage"],
     image: "/medical-screening-checkup.jpg",
     author: {
-      name: "Dr. Sophie Martin",
+      name: "Dr. Astou Faye",
       role: "Gynécologue",
       avatar: "/placeholder-user.jpg"
     },
@@ -73,7 +73,7 @@ const articles = [
     tags: ["relaxation", "anxiété", "bien-être", "stress"],
     image: "/peaceful-nature-meditation.png",
     author: {
-      name: "Sophie Leroy",
+      name: "Astou Faye",
       role: "Psycho-oncologue",
       avatar: "/placeholder-user.jpg"
     },
@@ -128,7 +128,7 @@ const videos = [
     videoUrl: "https://www.youtube.com/watch?v=example2",
     duration: 525, // 8:45 en secondes
     author: {
-      name: "Dr. Jean Martin",
+      name: "Dr. Abdoul Karim",
       role: "Thérapeute",
       avatar: "/placeholder-user.jpg"
     },

@@ -27,13 +27,13 @@ APPOINTMENT_DATA='{
   "location": {
     "name": "Clinique Test API",
     "address": "123 Rue de Test",
-    "phone": "+33 1 23 45 67 89",
+    "phone": "+221 77 555 78 45",
     "type": "clinic"
   },
   "doctor": {
     "name": "Dr. Test",
     "specialty": "Oncologie",
-    "phone": "+33 1 98 76 54 32"
+    "phone": "+221 77 555 78 45"
   },
   "notes": "Apporter les résultats d'\''analyses"
 }'

@@ -33,8 +33,8 @@ async function seedDatabase() {
         role: 'user'
       },
       {
-        name: 'Dr. Jean Martin',
-        email: 'dr.martin@hopital.fr',
+        name: 'Dr. Abdoul Karim ',
+        email: 'dr.abdoul@hopital.sn',
         password: await bcrypt.hash('doctor123', 12),
         profile: {
           gender: 'male' as const,
@@ -94,7 +94,7 @@ async function seedDatabase() {
         category: "Prévention",
         tags: ["prévention", "habitudes", "santé", "style de vie"],
         author: {
-          name: "Dr. Sophie Blanc",
+          name: "Dr. Aminata Fall",
           role: "Oncologue",
           avatar: "/placeholder-user.jpg"
         },
@@ -722,7 +722,7 @@ async function seedDatabase() {
         videoUrl: "https://example.com/video1.mp4",
         duration: 900, // 15 minutes
         author: {
-          name: "Sophie Zen",
+          name: "Khady Dieng",
           role: "Instructrice de méditation",
           avatar: "/placeholder-user.jpg"
         },

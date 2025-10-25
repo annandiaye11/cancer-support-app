@@ -100,7 +100,7 @@ async function testAppointments() {
           type: 'clinic' as const
         },
         doctor: {
-          name: 'Dr. Sophie Martin',
+          name: 'Dr. Astou Faye',
           specialty: 'Radiologie'
         },
         reminders: {

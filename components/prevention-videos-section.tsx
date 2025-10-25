@@ -225,7 +225,7 @@ export function PreventionVideosSection({ userProfile }: PreventionVideosSection
         title: "Santé masculine : prévention des cancers chez l'homme",
         description: "Guide complet de prévention des cancers les plus fréquents chez l'homme : prostate, testicules, colorectal.",
         duration: "24:30",
-        expert: "Dr. Pierre Martin - Urologue",
+        expert: "Dr. Alioune  Badara - Urologue",
         views: "38.7k"
       }
 

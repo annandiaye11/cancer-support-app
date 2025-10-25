@@ -11,7 +11,8 @@ export async function GET(
   try {
     await connectDB()
     
-    const user = await User.findById(params.id).select('-password')
+    const { id } = await params
+    const user = await User.findById(id).select('-password')
     
     if (!user) {
       return NextResponse.json(
@@ -38,6 +39,7 @@ export async function PUT(
   try {
     await connectDB()
     
+    const { id } = await params
     const body = await request.json()
     const { password, ...updateData } = body
     
@@ -47,7 +49,7 @@ export async function PUT(
     }
     
     const user = await User.findByIdAndUpdate(
-      params.id,
+      id,
       updateData,
       { new: true, runValidators: true }
     ).select('-password')
@@ -77,7 +79,8 @@ export async function DELETE(
   try {
     await connectDB()
     
-    const user = await User.findByIdAndDelete(params.id)
+    const { id } = await params
+    const user = await User.findByIdAndDelete(id)
     
     if (!user) {
       return NextResponse.json(
