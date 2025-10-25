@@ -1,161 +1,205 @@
-"use client"
+'use client'
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { User, Heart, Shield, Settings, Bell, Lock, HelpCircle, LogOut } from "lucide-react"
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { User, Settings, Calendar, BookOpen, Activity, Shield, Bell, LogOut } from 'lucide-react'
+import { useUserProfile, useUserPreferences } from '@/hooks/useApi'
 
-interface ProfileSectionProps {
-  userProfile: {
-    gender: "male" | "female"
-    mode: "preventive" | "curative"
-  }
-}
+export function ProfileSection() {
+  // Utiliser les vrais hooks API
+  const { profile, loading: profileLoading, error: profileError } = useUserProfile()
+  const { preferences, loading: preferencesLoading, error: preferencesError } = useUserPreferences()
 
-export function ProfileSection({ userProfile }: ProfileSectionProps) {
-  return (
-    <div className="space-y-6 pb-20 md:pb-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-3 rounded-full bg-primary/10">
-          <User className="w-6 h-6 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Profil</h2>
-          <p className="text-muted-foreground">Gérez vos informations personnelles</p>
+  if (profileLoading || preferencesLoading) {
+    return (
+      <div className="space-y-6 pb-20 md:pb-6">
+        <Card className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <Skeleton className="w-20 h-20 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+        </Card>
+        <div className="space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
         </div>
       </div>
+    )
+  }
 
-      {/* Profile Card */}
-      <Card className="p-6">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-            <User className="w-10 h-10 text-primary" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold text-foreground mb-1">Utilisateur</h3>
-            <p className="text-muted-foreground mb-3">user@example.com</p>
-            <div className="flex flex-wrap gap-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
-                {userProfile.mode === "preventive" ? (
-                  <>
-                    <Shield className="w-4 h-4" />
-                    <span>Mode Préventif</span>
-                  </>
-                ) : (
-                  <>
-                    <Heart className="w-4 h-4" />
-                    <span>Mode Curatif</span>
-                  </>
-                )}
-              </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm">
-                <User className="w-4 h-4" />
-                <span>{userProfile.gender === "female" ? "Femme" : "Homme"}</span>
+  if (profileError || preferencesError) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Erreur lors du chargement du profil</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6 pb-20 md:pb-6">
+      {/* Informations du profil */}
+      {profile && (
+        <Card className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <Avatar className="w-20 h-20">
+              <AvatarImage src={profile.avatar} alt={profile.name} />
+              <AvatarFallback className="text-xl">
+                {profile.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-2xl font-bold">{profile.name}</h2>
+              <p className="text-muted-foreground">{profile.email}</p>
+              <div className="flex gap-2 mt-2">
+                <Badge variant="outline">
+                  {profile.gender === 'female' ? 'Femme' : 'Homme'}
+                </Badge>
+                <Badge variant="outline">
+                  {profile.age} ans
+                </Badge>
+                <Badge variant={profile.mode === 'preventive' ? 'default' : 'secondary'}>
+                  {profile.mode === 'preventive' ? 'Préventif' : 'Curatif'}
+                </Badge>
               </div>
             </div>
           </div>
-          <Button variant="outline" size="sm">
-            Modifier
+          
+          <div className="flex gap-3">
+            <Button>
+              <Settings className="w-4 h-4 mr-2" />
+              Modifier le profil
+            </Button>
+            <Button variant="outline">
+              <Shield className="w-4 h-4 mr-2" />
+              Confidentialité
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Statistiques d'utilisation */}
+      {profile && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Mon activité</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">{profile.stats?.articlesRead || 0}</div>
+              <div className="text-sm text-muted-foreground">Articles lus</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">{profile.stats?.videosWatched || 0}</div>
+              <div className="text-sm text-muted-foreground">Vidéos vues</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">{profile.stats?.appointmentsScheduled || 0}</div>
+              <div className="text-sm text-muted-foreground">RDV planifiés</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">{profile.stats?.screeningsCompleted || 0}</div>
+              <div className="text-sm text-muted-foreground">Dépistages</div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Préférences */}
+      {preferences && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Préférences</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Bell className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Notifications</p>
+                  <p className="text-sm text-muted-foreground">Rappels et alertes</p>
+                </div>
+              </div>
+              <Badge variant={preferences.notifications ? 'default' : 'secondary'}>
+                {preferences.notifications ? 'Activées' : 'Désactivées'}
+              </Badge>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Activity className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Rappels de dépistage</p>
+                  <p className="text-sm text-muted-foreground">Fréquence: {preferences.screeningReminders}</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">
+                Modifier
+              </Button>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <BookOpen className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Contenu préféré</p>
+                  <p className="text-sm text-muted-foreground">
+                    {preferences.contentPreferences?.join(', ') || 'Aucune préférence'}
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">
+                Personnaliser
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Actions rapides */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Actions rapides</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Button variant="outline" className="justify-start">
+            <Calendar className="w-4 h-4 mr-2" />
+            Programmer un RDV
+          </Button>
+          <Button variant="outline" className="justify-start">
+            <Activity className="w-4 h-4 mr-2" />
+            Historique médical
+          </Button>
+          <Button variant="outline" className="justify-start">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Mes articles sauvegardés
+          </Button>
+          <Button variant="outline" className="justify-start">
+            <Shield className="w-4 h-4 mr-2" />
+            Sécurité du compte
           </Button>
         </div>
       </Card>
 
-      {/* Settings Sections */}
-      <div className="space-y-3">
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-primary/10">
-              <Settings className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-foreground">Paramètres généraux</h4>
-              <p className="text-sm text-muted-foreground">Langue, thème, préférences</p>
-            </div>
-            <Button variant="ghost" size="sm">
-              Accéder
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-accent/10">
-              <Bell className="w-5 h-5 text-accent" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-foreground">Notifications</h4>
-              <p className="text-sm text-muted-foreground">Gérer les alertes et rappels</p>
-            </div>
-            <Button variant="ghost" size="sm">
-              Accéder
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-primary/10">
-              <Lock className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-foreground">Confidentialité et sécurité</h4>
-              <p className="text-sm text-muted-foreground">Mot de passe, données personnelles</p>
-            </div>
-            <Button variant="ghost" size="sm">
-              Accéder
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-accent/10">
-              <HelpCircle className="w-5 h-5 text-accent" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-foreground">Aide et support</h4>
-              <p className="text-sm text-muted-foreground">FAQ, contact, ressources</p>
-            </div>
-            <Button variant="ghost" size="sm">
-              Accéder
-            </Button>
-          </div>
-        </Card>
-      </div>
-
-      {/* Statistics */}
+      {/* Déconnexion */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Votre activité</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary mb-1">12</p>
-            <p className="text-sm text-muted-foreground">Articles lus</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-accent mb-1">8</p>
-            <p className="text-sm text-muted-foreground">Vidéos vues</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary mb-1">3</p>
-            <p className="text-sm text-muted-foreground">RDV planifiés</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-accent mb-1">15</p>
-            <p className="text-sm text-muted-foreground">Jours actifs</p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Logout */}
-      <Card className="p-4 border-destructive/20 hover:border-destructive/40 transition-colors cursor-pointer">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-lg bg-destructive/10">
-            <LogOut className="w-5 h-5 text-destructive" />
-          </div>
-          <div className="flex-1">
-            <h4 className="font-medium text-destructive">Se déconnecter</h4>
-            <p className="text-sm text-muted-foreground">Quitter votre session</p>
-          </div>
+        <div className="space-y-3">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => {
+              localStorage.removeItem('userProfile')
+              localStorage.removeItem('isOnboarded')
+              window.location.reload()
+            }}
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Modifier mes informations
+          </Button>
+          <Button variant="destructive" className="w-full">
+            <LogOut className="w-4 h-4 mr-2" />
+            Se déconnecter
+          </Button>
         </div>
       </Card>
     </div>

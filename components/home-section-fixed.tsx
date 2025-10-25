@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle2, Circle, ChevronRight, Clock, TrendingUp, Book, Calendar, Target } from "lucide-react"
 import { useState } from "react"
-import { useHomeStats, useArticles } from "@/hooks/useApi"
+import { useHomeStats } from "@/hooks/useApi"
 
 interface HomeSectionProps {
   userProfile: {
@@ -26,124 +26,8 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
   })
   const [completedScreenings, setCompletedScreenings] = useState<Record<string, boolean>>({})
 
-  // Utiliser les hooks API pour récupérer les vraies données
+  // Utiliser les hooks API
   const { stats, loading: statsLoading } = useHomeStats()
-  const { articles: allArticles, loading: articlesLoading } = useArticles({ limit: 6 })
-  
-  // Filtrer les articles recommandés selon le profil utilisateur
-  const getRecommendedArticles = (): any[] => {
-    // Si on a des articles de l'API, les utiliser avec filtrage par tags
-    if (allArticles && allArticles.length > 0) {
-      // Prioriser les articles en vedette
-      const featured = allArticles.filter((article: any) => article.isFeatured)
-      const nonFeatured = allArticles.filter((article: any) => !article.isFeatured)
-      
-      // Filtrer par tags correspondant au profil
-      const filtered = [...featured, ...nonFeatured].filter((article: any) => {
-        const tags = article.tags || []
-        const matchesGender = tags.includes(userProfile.gender) || tags.includes('unisex') || tags.length === 0
-        const matchesMode = tags.includes(userProfile.mode) || tags.length === 0
-        return matchesGender && matchesMode
-      })
-      
-      return filtered.slice(0, 4)
-    }
-    
-    // Sinon, utiliser le fallback local avec articles hardcodés
-    const commonArticles = [
-      {
-        _id: "1",
-        id: 1,
-        title: "Les aliments anti-cancer à privilégier",
-        category: "Nutrition",
-        excerpt: "Découvrez les aliments riches en antioxydants",
-        image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400",
-        readTime: 8,
-        isFeatured: true,
-      },
-      {
-        _id: "5",
-        id: 5,
-        title: "L'importance de l'activité physique",
-        category: "Prévention",
-        excerpt: "Pourquoi bouger régulièrement est essentiel",
-        image: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400",
-        readTime: 7,
-        isFeatured: true,
-      },
-    ]
-
-    const femaleArticles = [
-      {
-        _id: "7",
-        id: 7,
-        title: "Comprendre les différents types de dépistage",
-        category: "Dépistage",
-        excerpt: "Guide complet des examens recommandés pour les femmes",
-        image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=400",
-        readTime: 12,
-        isFeatured: true,
-      },
-      ...commonArticles,
-    ]
-
-    const maleArticles = [
-      {
-        _id: "8",
-        id: 8,
-        title: "Comprendre les différents types de dépistage",
-        category: "Dépistage",
-        excerpt: "Guide complet des examens recommandés pour les hommes",
-        image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=400",
-        readTime: 12,
-        isFeatured: true,
-      },
-      ...commonArticles,
-    ]
-
-    const preventiveArticles = [
-      {
-        _id: "2",
-        id: 2,
-        title: "Comprendre les différents types de dépistage",
-        category: "Prévention",
-        excerpt: "Guide complet des examens recommandés",
-        image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=400",
-        readTime: 12,
-        isFeatured: false,
-      },
-    ]
-
-    const curativeArticles = [
-      {
-        _id: "3",
-        id: 3,
-        title: "Gérer la fatigue pendant le traitement",
-        category: "Traitement",
-        excerpt: "Conseils pratiques pour mieux gérer la fatigue",
-        image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400",
-        readTime: 6,
-        isFeatured: false,
-      },
-      {
-        _id: "4",
-        id: 4,
-        title: "Méditation et cancer : les bienfaits prouvés",
-        category: "Bien-être",
-        excerpt: "Comment la méditation améliore votre qualité de vie",
-        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400",
-        readTime: 10,
-        isFeatured: false,
-      },
-    ]
-
-    const genderArticles = userProfile.gender === "female" ? femaleArticles : maleArticles
-    const modeArticles = userProfile.mode === "preventive" ? preventiveArticles : curativeArticles
-    
-    return [...genderArticles.slice(0, 2), ...modeArticles.slice(0, 2)]
-  }
-  
-  const articles = getRecommendedArticles()
   
   // Données de démonstration pour les dépistages
   const recommendedScreenings = [
@@ -161,6 +45,69 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
     }
   ]
   const screeningsLoading = false
+
+  // Articles recommandés selon le genre et le mode
+  const getRecommendedArticles = () => {
+    const commonArticles = [
+      {
+        id: 1,
+        title: "Les aliments anti-cancer à privilégier",
+        category: "Nutrition",
+        excerpt: "Découvrez les aliments riches en antioxydants",
+        image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400",
+        readTime: "8 min",
+        trending: true,
+      },
+      {
+        id: 5,
+        title: "L'importance de l'activité physique",
+        category: "Prévention",
+        excerpt: "Pourquoi bouger régulièrement est essentiel",
+        image: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400",
+        readTime: "7 min",
+        trending: true,
+      },
+    ]
+
+    const femaleArticles = [
+      {
+        id: 2,
+        title: "Auto-examen des seins : guide complet",
+        category: "Prévention",
+        excerpt: "Les gestes essentiels à connaître",
+        image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400",
+        readTime: "6 min",
+        trending: false,
+      },
+      {
+        id: 3,
+        title: "Mammographie : tout ce qu'il faut savoir",
+        category: "Dépistage",
+        excerpt: "Préparation et déroulement de l'examen",
+        image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400",
+        readTime: "5 min",
+        trending: false,
+      },
+    ]
+
+    const maleArticles = [
+      {
+        id: 4,
+        title: "Dépistage du cancer de la prostate",
+        category: "Dépistage",
+        excerpt: "Quand et comment se faire dépister",
+        image: "https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=400",
+        readTime: "7 min",
+        trending: false,
+      },
+    ]
+
+    if (userProfile.gender === "female") {
+      return [...commonArticles, ...femaleArticles]
+    } else {
+      return [...commonArticles, ...maleArticles]
+    }
+  }
 
   const toggleScreening = (monthKey: string) => {
     setScreenings(prev => ({
@@ -194,7 +141,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
     })
   }
 
-  if (statsLoading || screeningsLoading || articlesLoading) {
+  if (statsLoading || screeningsLoading) {
     return (
       <div className="space-y-6 pb-20 md:pb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -222,8 +169,8 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                 <Book className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats?.totalArticles || 0}</p>
-                <p className="text-sm text-muted-foreground">Articles disponibles</p>
+                <p className="text-2xl font-bold">{stats?.totalArticlesRead || 0}</p>
+                <p className="text-sm text-muted-foreground">Articles lus</p>
               </div>
             </div>
           </Card>
@@ -246,8 +193,8 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                 <Target className="w-5 h-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats?.completedTasks || 0}</p>
-                <p className="text-sm text-muted-foreground">Tâches complétées</p>
+                <p className="text-2xl font-bold">{stats?.screeningsDue || 0}</p>
+                <p className="text-sm text-muted-foreground">Dépistages dus</p>
               </div>
             </div>
           </Card>
@@ -258,8 +205,8 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                 <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats?.totalVideos || 0}</p>
-                <p className="text-sm text-muted-foreground">Vidéos disponibles</p>
+                <p className="text-2xl font-bold">{stats?.healthScore || 85}%</p>
+                <p className="text-sm text-muted-foreground">Score santé</p>
               </div>
             </div>
           </Card>
@@ -305,6 +252,32 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
         </Card>
       )}
 
+      {/* Recommandations personnalisées */}
+      {stats?.recommendations && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Recommandations pour vous</h3>
+          <div className="space-y-3">
+            {stats.recommendations.map((rec: any, index: number) => (
+              <div key={index} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                <div className="relative mt-1">
+                  <div className="w-24 h-24 rounded-full bg-linear-to-br from-primary/20 to-accent/30 flex items-center justify-center border-2 border-primary/30 shadow-lg">
+                    <TrendingUp className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="absolute -inset-1 rounded-full bg-linear-to-r from-primary/20 to-accent/20 blur-sm -z-10 animate-pulse"></div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium">{rec.title}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                  <Button variant="link" className="h-auto p-0 mt-2">
+                    En savoir plus <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* Articles recommandés */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -314,11 +287,11 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {articles.slice(0, 4).map((article) => (
+          {getRecommendedArticles().slice(0, 4).map((article) => (
             <div 
-              key={article._id} 
+              key={article.id} 
               className="group cursor-pointer"
-              onClick={() => onArticleClick?.(parseInt(article._id))}
+              onClick={() => onArticleClick?.(article.id)}
             >
               <div className="flex gap-3">
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0">
@@ -327,7 +300,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
-                  {article.isFeatured && (
+                  {article.trending && (
                     <div className="absolute top-1 right-1">
                       <TrendingUp className="w-3 h-3 text-orange-500" />
                     </div>
@@ -340,7 +313,7 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
                   </h4>
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">{article.readTime} min</span>
+                    <span className="text-xs text-muted-foreground">{article.readTime}</span>
                   </div>
                 </div>
               </div>

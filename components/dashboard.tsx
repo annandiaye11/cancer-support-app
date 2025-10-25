@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Home, BookOpen, Video, Calendar, User, Heart, Shield, Menu, X } from "lucide-react"
 import { ArticlesSection } from "@/components/articles-section"
@@ -21,6 +22,7 @@ interface DashboardProps {
 }
 
 export function Dashboard({ userProfile }: DashboardProps) {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState("home")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -152,16 +154,16 @@ export function Dashboard({ userProfile }: DashboardProps) {
             }}
           />
         )}
-        {activeTab === "articles" && <ArticlesSection userProfile={userProfile} />}
+        {activeTab === "articles" && <ArticlesSection />}
         {activeTab === "videos" && (
           userProfile.mode === "preventive" 
             ? <PreventionVideosSection userProfile={userProfile} />
-            : <VideosSection userProfile={userProfile} />
+            : <VideosSection />
         )}
         {activeTab === "ai-psy" && <AiPsyChat userProfile={userProfile} />}
         {activeTab === "calendar" && <CalendarSection userProfile={userProfile} />}
         {activeTab === "appointments" && <AppointmentsSection userProfile={userProfile} />}
-        {activeTab === "profile" && <ProfileSection userProfile={userProfile} />}
+        {activeTab === "profile" && <ProfileSection />}
       </main>
 
       {/* Bottom Navigation (Mobile) */}
