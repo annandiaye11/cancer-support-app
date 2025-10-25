@@ -7,6 +7,9 @@ import { Dashboard } from "@/components/dashboard"
 export default function Home() {
   const [isOnboarded, setIsOnboarded] = useState(false)
   const [userProfile, setUserProfile] = useState<{
+    userId: string
+    name: string
+    email: string
     gender: "male" | "female"
     mode: "preventive" | "curative"
     age: number
@@ -42,6 +45,9 @@ export default function Home() {
   }, [userProfile])
 
   const handleOnboardingComplete = (profile: {
+    userId: string
+    name: string
+    email: string
     gender: "male" | "female"
     mode: "preventive" | "curative"
     age: number

@@ -7,6 +7,7 @@ import { CheckCircle2, Circle, ChevronRight, Clock, TrendingUp, Book, Calendar, 
 import { useState, useEffect } from "react"
 import { useHomeStats, useArticles } from "@/hooks/useApi"
 import { useUserId } from "@/hooks/use-user-id"
+import Link from "next/link"
 
 interface HomeSectionProps {
   userProfile: {
@@ -14,11 +15,9 @@ interface HomeSectionProps {
     mode: "preventive" | "curative"
     age: number
   }
-  onViewAllArticles?: () => void
-  onArticleClick?: (articleId: number) => void
 }
 
-export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: HomeSectionProps) {
+export function HomeSection({ userProfile }: HomeSectionProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [screenings, setScreenings] = useState<Record<string, boolean>>({
     "2025-01": false,
@@ -427,48 +426,136 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
       )}
 
       {/* Articles recommandés */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Articles recommandés</h3>
-          <Button variant="outline" size="sm" onClick={onViewAllArticles}>
-            Voir tous
-          </Button>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-bold">Articles recommandés</h3>
+            <p className="text-sm text-muted-foreground">Conseils et informations pour vous accompagner</p>
+          </div>
+          <Link href="/articles">
+            <Button variant="outline" size="sm" className="gap-2">
+              Voir tous
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {articles.slice(0, 4).map((article) => (
-            <div 
-              key={article._id} 
-              className="group cursor-pointer"
-              onClick={() => onArticleClick?.(parseInt(article._id))}
+
+        {articles.length > 0 && (
+          <>
+            {/* Article principal en vedette */}
+            <Link 
+              href={`/articles/${articles[0].slug}`}
+              className="block group"
             >
-              <div className="flex gap-3">
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                  <img 
-                    src={article.image} 
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
-                  {article.isFeatured && (
-                    <div className="absolute top-1 right-1">
-                      <TrendingUp className="w-3 h-3 text-orange-500" />
+              <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div className="grid md:grid-cols-2 gap-0">
+                  {/* Image */}
+                  <div className="relative h-64 md:h-full">
+                    <img 
+                      src={articles[0].image} 
+                      alt={articles[0].title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    {articles[0].isFeatured && (
+                      <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        Populaire
+                      </div>
+                    )}
+                    <div className="absolute bottom-4 left-4">
+                      <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
+                        {articles[0].category}
+                      </span>
                     </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs text-primary font-medium">{article.category}</span>
-                  <h4 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                    {article.title}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Clock className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">{article.readTime} min</span>
+                  </div>
+
+                  {/* Contenu */}
+                  <div className="p-6 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
+                        {articles[0].title}
+                      </h4>
+                      <p className="text-muted-foreground mb-4 line-clamp-3">
+                        {articles[0].excerpt}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{articles[0].readTime} min</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Book className="w-4 h-4" />
+                          <span>{articles[0].views || 0} vues</span>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="gap-2">
+                        Lire l'article
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
+              </Card>
+            </Link>
+
+            {/* Autres articles en grille */}
+            {articles.length > 1 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {articles.slice(1, 4).map((article) => (
+                  <Link 
+                    key={article._id} 
+                    href={`/articles/${article.slug}`}
+                    className="group"
+                  >
+                    <Card className="overflow-hidden hover:shadow-md transition-all duration-300 h-full">
+                      {/* Image */}
+                      <div className="relative h-48">
+                        <img 
+                          src={article.image} 
+                          alt={article.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {article.isFeatured && (
+                          <div className="absolute top-2 right-2">
+                            <TrendingUp className="w-4 h-4 text-orange-500 bg-white rounded-full p-1" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Contenu */}
+                      <div className="p-4">
+                        <span className="text-xs text-primary font-medium">
+                          {article.category}
+                        </span>
+                        <h4 className="font-semibold text-base mt-2 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                          {article.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                          {article.excerpt}
+                        </p>
+                        
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{article.readTime} min</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Book className="w-3 h-3" />
+                            <span>{article.views || 0}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

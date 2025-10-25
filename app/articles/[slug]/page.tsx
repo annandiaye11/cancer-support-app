@@ -156,10 +156,10 @@ export default function ArticlePage() {
             <CardContent className="text-center py-12">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Article non trouvé</h1>
               <p className="text-gray-600 mb-6">L'article que vous cherchez n'existe pas ou a été supprimé.</p>
-              <Link href="/">
+              <Link href="/articles">
                 <Button variant="default">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour à l'accueil
+                  Retour aux articles
                 </Button>
               </Link>
             </CardContent>
@@ -171,16 +171,26 @@ export default function ArticlePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <div className="max-w-4xl mx-auto p-4 pt-8">
-        {/* Navigation */}
-        <div className="mb-6">
-          <Link href="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour aux articles
-            </Button>
-          </Link>
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/articles">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Articles</span>
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="ghost" size="sm">
+                Accueil
+              </Button>
+            </Link>
+          </div>
         </div>
+      </header>
+
+      <div className="max-w-4xl mx-auto p-4 pt-8">
 
         {/* Article */}
         <article>

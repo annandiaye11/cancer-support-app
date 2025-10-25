@@ -9,6 +9,7 @@ import { BreastExamInteractive } from "@/components/breast-exam-interactive"
 
 interface CalendarSectionProps {
   userProfile: {
+    userId: string
     gender: "male" | "female"
     mode: "preventive" | "curative"
     age: number
@@ -21,9 +22,50 @@ interface ScreeningCheck {
   completed: boolean
 }
 
+interface Appointment {
+  _id: string
+  title: string
+  description?: string
+  type: 'medical' | 'treatment' | 'support' | 'screening'
+  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled' | 'rescheduled'
+  date: string
+  time: string
+  duration: number
+  location: {
+    name: string
+    address?: string
+    phone?: string
+    type: 'hospital' | 'clinic' | 'home' | 'online'
+  }
+  doctor?: {
+    name: string
+    specialty: string
+  }
+}
+
 export function CalendarSection({ userProfile }: CalendarSectionProps) {
   const [screeningChecks, setScreeningChecks] = useState<Record<string, ScreeningCheck[]>>({})
   const [showBreastExamGuide, setShowBreastExamGuide] = useState(false)
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false)
+
+  // Charger les rendez-vous depuis l'API
+  useEffect(() => {
+    if (userProfile.mode === "curative" && userProfile.userId) {
+      setIsLoadingAppointments(true)
+      fetch(`/api/appointments?userId=${userProfile.userId}`)
+        .then(res => res.json())
+        .then(data => {
+          setAppointments(data.appointments || [])
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement des rendez-vous:', error)
+        })
+        .finally(() => {
+          setIsLoadingAppointments(false)
+        })
+    }
+  }, [userProfile.userId, userProfile.mode])
 
   useEffect(() => {
     const saved = localStorage.getItem("screeningChecks")
@@ -178,25 +220,6 @@ export function CalendarSection({ userProfile }: CalendarSectionProps) {
           },
         ]
 
-  const appointments = [
-    {
-      id: 1,
-      title: "Consultation oncologie",
-      date: "2025-10-28",
-      time: "14:30",
-      location: "Hôpital Saint-Louis",
-      type: "medical",
-    },
-    {
-      id: 2,
-      title: "Séance de chimiothérapie",
-      date: "2025-10-30",
-      time: "09:00",
-      location: "Centre de traitement",
-      type: "treatment",
-    },
-  ]
-
   return (
     <div className="space-y-6 pb-20 md:pb-6">
       <div className="flex items-center justify-between">
@@ -270,19 +293,62 @@ export function CalendarSection({ userProfile }: CalendarSectionProps) {
 
       {userProfile.mode === "curative" && (
         <div className="space-y-4">
-          {appointments.map((apt) => (
-            <Card key={apt.id} className="p-4">
-              <h4 className="font-semibold">{apt.title}</h4>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                <Clock className="w-4 h-4" />
-                <span>{new Date(apt.date).toLocaleDateString("fr-FR")} à {apt.time}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4" />
-                <span>{apt.location}</span>
+          {isLoadingAppointments ? (
+            <Card className="p-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Chargement des rendez-vous...</p>
               </div>
             </Card>
-          ))}
+          ) : appointments.length === 0 ? (
+            <Card className="p-8">
+              <div className="text-center">
+                <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Aucun rendez-vous prévu</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Cliquez sur "Ajouter" pour planifier un nouveau rendez-vous
+                </p>
+              </div>
+            </Card>
+          ) : (
+            appointments.map((apt) => (
+              <Card key={apt._id} className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground">{apt.title}</h4>
+                    {apt.description && (
+                      <p className="text-sm text-muted-foreground mt-1">{apt.description}</p>
+                    )}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                      <Clock className="w-4 h-4" />
+                      <span>{new Date(apt.date).toLocaleDateString("fr-FR")} à {apt.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      <span>{apt.location.name}</span>
+                    </div>
+                    {apt.doctor && (
+                      <div className="text-sm text-muted-foreground mt-1">
+                        👨‍⚕️ {apt.doctor.name} - {apt.doctor.specialty}
+                      </div>
+                    )}
+                  </div>
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    apt.status === 'confirmed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                    apt.status === 'scheduled' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                    apt.status === 'completed' ? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400' :
+                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                  }`}>
+                    {apt.status === 'scheduled' && 'Planifié'}
+                    {apt.status === 'confirmed' && 'Confirmé'}
+                    {apt.status === 'completed' && 'Terminé'}
+                    {apt.status === 'cancelled' && 'Annulé'}
+                    {apt.status === 'rescheduled' && 'Reporté'}
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
         </div>
       )}
 

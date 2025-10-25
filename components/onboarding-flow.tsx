@@ -4,21 +4,74 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Heart, Shield, User, Users } from "lucide-react"
+import { Heart, Shield, User, Users, Mail, UserCircle } from "lucide-react"
 
 interface OnboardingFlowProps {
-  onComplete: (profile: { gender: "male" | "female"; mode: "preventive" | "curative"; age: number }) => void
+  onComplete: (profile: { 
+    userId: string
+    name: string
+    email: string
+    gender: "male" | "female"
+    mode: "preventive" | "curative"
+    age: number 
+  }) => void
 }
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(1)
+  const [name, setName] = useState<string>("")
+  const [email, setEmail] = useState<string>("")
   const [gender, setGender] = useState<"male" | "female" | null>(null)
   const [mode, setMode] = useState<"preventive" | "curative" | null>(null)
   const [age, setAge] = useState<string>("")
+  const [isCreatingUser, setIsCreatingUser] = useState(false)
+  const [error, setError] = useState<string>("")
 
-  const handleComplete = () => {
-    if (gender && mode && age) {
-      onComplete({ gender, mode, age: Number.parseInt(age) })
+  const handleComplete = async () => {
+    if (name && email && gender && mode && age) {
+      setIsCreatingUser(true)
+      setError("")
+
+      try {
+        // Créer l'utilisateur dans MongoDB
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password: 'temp-password-' + Date.now(), // Mot de passe temporaire
+            profile: {
+              gender,
+              age: Number.parseInt(age),
+              mode,
+            },
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Erreur lors de la création du profil')
+        }
+
+        const userData = await response.json()
+        
+        // Appeler onComplete avec le userId de MongoDB
+        onComplete({ 
+          userId: userData._id,
+          name, 
+          email, 
+          gender, 
+          mode, 
+          age: Number.parseInt(age) 
+        })
+      } catch (error) {
+        console.error('Erreur création utilisateur:', error)
+        setError(error instanceof Error ? error.message : 'Erreur de connexion')
+        setIsCreatingUser(false)
+      }
     }
   }
 
@@ -36,7 +89,61 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         {step === 1 && (
           <Card className="p-8 space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-semibold text-foreground">Bienvenue</h2>
+              <h2 className="text-2xl font-semibold text-foreground">Créons votre compte</h2>
+              <p className="text-muted-foreground">Commençons par quelques informations basiques</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <UserCircle className="w-4 h-4" />
+                  Votre nom complet
+                </label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ex: Marie Dupont"
+                  className="h-12"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Votre adresse email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="exemple@email.com"
+                  className="h-12"
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Vos informations sont sécurisées et ne seront jamais partagées.
+              </p>
+            </div>
+
+            <Button 
+              onClick={() => setStep(2)} 
+              disabled={!name.trim() || !email.trim() || !email.includes('@')} 
+              className="w-full" 
+              size="lg"
+            >
+              Continuer
+            </Button>
+          </Card>
+        )}
+
+        {step === 2 && (
+          <Card className="p-8 space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-semibold text-foreground">Bienvenue {name.split(' ')[0]}</h2>
               <p className="text-muted-foreground">Personnalisons votre expérience pour mieux vous accompagner</p>
             </div>
 
@@ -68,13 +175,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </div>
             </div>
 
-            <Button onClick={() => setStep(2)} disabled={!gender} className="w-full" size="lg">
+            <Button onClick={() => setStep(3)} disabled={!gender} className="w-full" size="lg">
               Continuer
             </Button>
           </Card>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <Card className="p-8 space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-semibold text-foreground">Votre parcours</h2>
@@ -128,17 +235,17 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={() => setStep(1)} variant="outline" className="flex-1" size="lg">
+              <Button onClick={() => setStep(2)} variant="outline" className="flex-1" size="lg">
                 Retour
               </Button>
-              <Button onClick={() => setStep(3)} disabled={!mode} className="flex-1" size="lg">
+              <Button onClick={() => setStep(4)} disabled={!mode} className="flex-1" size="lg">
                 Continuer
               </Button>
             </div>
           </Card>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <Card className="p-8 space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-semibold text-foreground">Votre âge</h2>
@@ -159,24 +266,37 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   onChange={(e) => setAge(e.target.value)}
                   placeholder="Entrez votre âge"
                   className="text-lg h-14"
+                  disabled={isCreatingUser}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
                 Cette information nous permet de vous proposer des rappels de dépistage adaptés à votre âge.
               </p>
+              
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
+                  <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={() => setStep(2)} variant="outline" className="flex-1" size="lg">
+              <Button 
+                onClick={() => setStep(3)} 
+                variant="outline" 
+                className="flex-1" 
+                size="lg"
+                disabled={isCreatingUser}
+              >
                 Retour
               </Button>
               <Button
                 onClick={handleComplete}
-                disabled={!age || Number.parseInt(age) < 1 || Number.parseInt(age) > 120}
+                disabled={!age || Number.parseInt(age) < 1 || Number.parseInt(age) > 120 || isCreatingUser}
                 className="flex-1"
                 size="lg"
               >
-                Commencer
+                {isCreatingUser ? "Création du profil..." : "Commencer"}
               </Button>
             </div>
           </Card>
@@ -186,6 +306,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           <div className={`h-2 rounded-full transition-all ${step === 1 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
           <div className={`h-2 rounded-full transition-all ${step === 2 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
           <div className={`h-2 rounded-full transition-all ${step === 3 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
+          <div className={`h-2 rounded-full transition-all ${step === 4 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
         </div>
       </div>
     </div>

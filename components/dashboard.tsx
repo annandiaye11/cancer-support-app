@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Home, BookOpen, Video, Calendar, User, Heart, Shield, Menu, X } from "lucide-react"
 import { ArticlesSection } from "@/components/articles-section"
@@ -12,9 +12,11 @@ import { ProfileSection } from "@/components/profile-section"
 import { AiPsyChat } from "@/components/ai-psy-chat"
 import { AppointmentsSection } from "@/components/appointments-section"
 import { PreventionVideosSection } from "@/components/prevention-videos-section"
+import Link from "next/link"
 
 interface DashboardProps {
   userProfile: {
+    userId: string
     gender: "male" | "female"
     mode: "preventive" | "curative"
     age: number
@@ -31,7 +33,7 @@ export function Dashboard({ userProfile }: DashboardProps) {
     { id: "home", label: "Accueil", icon: Home },
     { id: "calendar", label: "Dépistages", icon: Calendar },
     { id: "videos", label: "Vidéos", icon: Video },
-    { id: "articles", label: "Guides", icon: BookOpen },
+    { id: "articles", label: "Articles", icon: BookOpen },
     { id: "appointments", label: "RDV", icon: Calendar },
     { id: "profile", label: "Profil", icon: User },
   ]
@@ -41,7 +43,7 @@ export function Dashboard({ userProfile }: DashboardProps) {
     { id: "ai-psy", label: "Psy IA", icon: Heart },
     { id: "videos", label: "Témoignages", icon: Video },
     { id: "appointments", label: "Rendez-vous", icon: Calendar },
-    { id: "articles", label: "Infos", icon: BookOpen },
+    { id: "articles", label: "Articles", icon: BookOpen },
     { id: "profile", label: "Profil", icon: User },
   ]
 
@@ -96,6 +98,22 @@ export function Dashboard({ userProfile }: DashboardProps) {
             <div className="space-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon
+                
+                // Pour les articles, utiliser un Link
+                if (item.id === "articles") {
+                  return (
+                    <Link
+                      key={item.id}
+                      href="/articles"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-foreground hover:bg-muted"
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </Link>
+                  )
+                }
+                
                 return (
                   <button
                     key={item.id}
@@ -123,6 +141,21 @@ export function Dashboard({ userProfile }: DashboardProps) {
           <div className="flex gap-1">
             {navigation.map((item) => {
               const Icon = item.icon
+              
+              // Pour les articles, utiliser un Link au lieu d'un bouton
+              if (item.id === "articles") {
+                return (
+                  <Link
+                    key={item.id}
+                    href="/articles"
+                    className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors border-transparent text-muted-foreground hover:text-foreground`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                )
+              }
+              
               return (
                 <button
                   key={item.id}
@@ -146,15 +179,9 @@ export function Dashboard({ userProfile }: DashboardProps) {
       <main className="container mx-auto px-4 py-6 md:py-8">
         {activeTab === "home" && (
           <HomeSection 
-            userProfile={userProfile} 
-            onViewAllArticles={() => setActiveTab("articles")}
-            onArticleClick={(articleId) => {
-              setActiveTab("articles")
-              // L'article sera ouvert dans ArticlesSection
-            }}
+            userProfile={userProfile}
           />
         )}
-        {activeTab === "articles" && <ArticlesSection />}
         {activeTab === "videos" && (
           userProfile.mode === "preventive" 
             ? <PreventionVideosSection userProfile={userProfile} />
@@ -171,6 +198,21 @@ export function Dashboard({ userProfile }: DashboardProps) {
         <div className="flex justify-around">
           {navigation.slice(0, 5).map((item) => {
             const Icon = item.icon
+            
+            // Pour les articles, utiliser un Link
+            if (item.id === "articles") {
+              return (
+                <Link
+                  key={item.id}
+                  href="/articles"
+                  className="flex flex-col items-center gap-1 py-3 px-4 flex-1 transition-colors text-muted-foreground"
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </Link>
+              )
+            }
+            
             return (
               <button
                 key={item.id}
