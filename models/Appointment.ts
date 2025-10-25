@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose'
 
 export interface IAppointment extends Document {
   _id: string
-  userId: mongoose.Types.ObjectId
+  userId: string  // Changé de ObjectId à string pour plus de flexibilité
   title: string
   description?: string
   type: 'medical' | 'treatment' | 'support' | 'screening'
@@ -33,9 +33,9 @@ export interface IAppointment extends Document {
 
 const AppointmentSchema = new Schema<IAppointment>({
   userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: String,  // Changé de ObjectId à String
+    required: true,
+    index: true
   },
   title: {
     type: String,

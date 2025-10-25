@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { CheckCircle2, Circle, ChevronRight, Clock, TrendingUp, Book, Calendar, Target } from "lucide-react"
 import { useState } from "react"
 import { useHomeStats, useArticles } from "@/hooks/useApi"
+import { useUserId } from "@/hooks/use-user-id"
 
 interface HomeSectionProps {
   userProfile: {
@@ -26,13 +27,17 @@ export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: 
   })
   const [completedScreenings, setCompletedScreenings] = useState<Record<string, boolean>>({})
 
+  // Récupérer l'ID utilisateur
+  const { userId } = useUserId()
+
   // Utiliser les hooks API pour récupérer les vraies données
-  const { stats, loading: statsLoading } = useHomeStats()
+  const { stats, loading: statsLoading } = useHomeStats(userId || undefined)
   const { articles: allArticles, loading: articlesLoading } = useArticles({ limit: 6 })
   
   // Filtrer les articles recommandés selon le profil utilisateur
   const getRecommendedArticles = () => {
-    if (!allArticles) return []
+    // S'assurer que allArticles est un tableau
+    if (!allArticles || !Array.isArray(allArticles)) return []
     
     // Prioriser les articles en vedette
     const featured = allArticles.filter(article => article.isFeatured)

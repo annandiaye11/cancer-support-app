@@ -50,6 +50,18 @@ interface HomeStats {
   totalVideos: number
   completedTasks: number
   upcomingAppointments: number
+  featuredArticles?: number
+  recentArticles?: number
+  totalArticlesRead?: number
+  screeningsDue?: number
+  healthScore?: number
+  recommendations?: Array<{
+    title: string
+    description: string
+    action: string
+    priority: 'high' | 'medium' | 'low'
+  }>
+  lastUpdate?: string
 }
 
 interface UserPreferences {
@@ -237,12 +249,48 @@ export function useArticles(filters: {
       try {
         setLoading(true)
         
-        // Simulation d'un délai API
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Construire l'URL avec les paramètres de requête
+        const params = new URLSearchParams()
+        if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+        if (filters.search) params.append('search', filters.search)
+        if (filters.featured !== undefined) params.append('featured', filters.featured.toString())
+        if (filters.limit) params.append('limit', filters.limit.toString())
+        if (filters.offset) params.append('offset', filters.offset.toString())
         
+        const url = `/api/articles?${params.toString()}`
+        const response = await fetch(url)
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des articles')
+        }
+        
+        const data = await response.json()
+        
+        // L'API peut retourner plusieurs formats :
+        // 1. { data: articles, pagination: { total, ... } }
+        // 2. { articles, total }
+        // 3. Directement un tableau
+        if (Array.isArray(data)) {
+          setArticles(data)
+          setTotal(data.length)
+        } else if (data.data) {
+          // Format avec data et pagination
+          setArticles(data.data)
+          setTotal(data.pagination?.total || data.data.length)
+        } else {
+          // Format avec articles et total
+          setArticles(data.articles || data)
+          setTotal(data.total || data.length || 0)
+        }
+        
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching articles:', err)
+        setError('Erreur lors du chargement des articles')
+        // Fallback sur les données mock en cas d'erreur
         let filteredArticles = [...mockArticles]
         
-        // Appliquer les filtres
+        // Appliquer les filtres sur les données mock
         if (filters.category && filters.category !== 'all') {
           filteredArticles = filteredArticles.filter(article => 
             article.category.toLowerCase() === filters.category?.toLowerCase()
@@ -264,14 +312,12 @@ export function useArticles(filters: {
           )
         }
         
-        // Trier par date de publication (plus récent en premier)
         filteredArticles.sort((a, b) => 
           new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
         )
         
         setTotal(filteredArticles.length)
         
-        // Appliquer la pagination
         if (filters.offset !== undefined) {
           const start = filters.offset
           const end = filters.limit ? start + filters.limit : undefined
@@ -281,9 +327,6 @@ export function useArticles(filters: {
         }
         
         setArticles(filteredArticles)
-        setError(null)
-      } catch (err) {
-        setError('Erreur lors du chargement des articles')
       } finally {
         setLoading(false)
       }
@@ -296,36 +339,77 @@ export function useArticles(filters: {
 }
 
 // Hook pour récupérer les vidéos
-export function useVideos() {
+export function useVideos(filters: {
+  category?: string
+  search?: string
+  featured?: boolean
+  limit?: number
+  offset?: number
+} = {}) {
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         setLoading(true)
         
-        // Simulation d'un délai API
-        await new Promise(resolve => setTimeout(resolve, 300))
+        // Construire l'URL avec les paramètres de requête
+        const params = new URLSearchParams()
+        if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+        if (filters.search) params.append('search', filters.search)
+        if (filters.featured !== undefined) params.append('featured', filters.featured.toString())
+        if (filters.limit) params.append('limit', filters.limit.toString())
+        if (filters.offset) params.append('offset', filters.offset.toString())
         
-        setVideos(mockVideos)
+        const url = `/api/videos?${params.toString()}`
+        const response = await fetch(url)
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des vidéos')
+        }
+        
+        const data = await response.json()
+        
+        // L'API peut retourner plusieurs formats :
+        // 1. { data: videos, pagination: { total, ... } }
+        // 2. { videos, total }
+        // 3. Directement un tableau
+        if (Array.isArray(data)) {
+          setVideos(data)
+          setTotal(data.length)
+        } else if (data.data) {
+          // Format avec data et pagination
+          setVideos(data.data)
+          setTotal(data.pagination?.total || data.data.length)
+        } else {
+          // Format avec videos et total
+          setVideos(data.videos || data)
+          setTotal(data.total || data.length || 0)
+        }
+        
         setError(null)
       } catch (err) {
+        console.error('Error fetching videos:', err)
         setError('Erreur lors du chargement des vidéos')
+        // Fallback sur les données mock en cas d'erreur
+        setVideos(mockVideos)
+        setTotal(mockVideos.length)
       } finally {
         setLoading(false)
       }
     }
 
     fetchVideos()
-  }, [])
+  }, [filters.category, filters.search, filters.featured, filters.limit, filters.offset])
 
-  return { videos, loading, error }
+  return { videos, loading, error, total }
 }
 
 // Hook pour récupérer les statistiques de la page d'accueil
-export function useHomeStats() {
+export function useHomeStats(userId?: string) {
   const [stats, setStats] = useState<HomeStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -335,20 +419,32 @@ export function useHomeStats() {
       try {
         setLoading(true)
         
-        // Simulation d'un délai API
-        await new Promise(resolve => setTimeout(resolve, 200))
+        // Appel à l'API réelle
+        const url = userId 
+          ? `/api/stats?userId=${userId}` 
+          : '/api/stats'
         
-        setStats(mockHomeStats)
+        const response = await fetch(url)
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des statistiques')
+        }
+        
+        const data = await response.json()
+        setStats(data)
         setError(null)
       } catch (err) {
+        console.error('Error fetching stats:', err)
         setError('Erreur lors du chargement des statistiques')
+        // Fallback sur les données mock en cas d'erreur
+        setStats(mockHomeStats)
       } finally {
         setLoading(false)
       }
     }
 
     fetchStats()
-  }, [])
+  }, [userId])
 
   return { stats, loading, error }
 }
