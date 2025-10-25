@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Clock, User, Calendar, Eye, Heart, Share2 } from 'lucide-react'
+import { ArrowLeft, Clock, User, Calendar, Eye, Heart, Share2, Bookmark } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -18,150 +18,66 @@ interface Article {
   image: string
   slug: string
   category: string
+  tags?: string[]
   readTime: number
   publishedAt: string
   author: {
     name: string
     role: string
+    avatar?: string
   }
   isFeatured: boolean
   views: number
   likes: number
 }
 
-// Données mock pour les articles (même structure que dans useApi.ts)
-const mockArticles: Article[] = [
-  {
-    _id: "1",
-    title: "Guide complet de l'alimentation pendant le traitement du cancer",
-    excerpt: "Découvrez les meilleures pratiques nutritionnelles pour maintenir votre force et votre énergie pendant le traitement.",
-    content: "Un guide détaillé sur l'alimentation pendant le traitement du cancer avec des conseils pratiques pour maintenir votre énergie et votre santé pendant cette période difficile.",
-    image: "/healthy-food-nutrition.png",
-    slug: "alimentation-traitement-cancer",
-    category: "Nutrition",
-    readTime: 8,
-    publishedAt: "2024-10-20T10:00:00Z",
-    author: {
-      name: "Dr. Marie Dubois",
-      role: "Oncologue nutritionniste"
-    },
-    isFeatured: true,
-    views: 1247,
-    likes: 89
-  },
-  {
-    _id: "2",
-    title: "Prévention du cancer : 10 habitudes à adopter dès maintenant",
-    excerpt: "Les habitudes de vie simples qui peuvent réduire significativement vos risques de développer un cancer.",
-    content: "Découvrez 10 habitudes scientifiquement prouvées pour réduire vos risques de cancer et améliorer votre santé globale.",
-    image: "/healthy-lifestyle-prevention.jpg",
-    slug: "prevention-cancer-10-habitudes",
-    category: "Prévention",
-    readTime: 6,
-    publishedAt: "2024-10-18T09:30:00Z",
-    author: {
-      name: "Dr. Pierre Martin",
-      role: "Médecin préventeur"
-    },
-    isFeatured: true,
-    views: 2134,
-    likes: 156
-  },
-  {
-    _id: "3",
-    title: "Techniques de relaxation pour gérer l'anxiété liée au cancer",
-    excerpt: "Apprenez des techniques simples et efficaces pour réduire le stress et l'anxiété pendant votre parcours de soins.",
-    content: "Des techniques de relaxation éprouvées pour vous aider à gérer l'anxiété et le stress liés au cancer.",
-    image: "/peaceful-nature-meditation.png",
-    slug: "relaxation-anxiete-cancer",
-    category: "Bien-être",
-    readTime: 5,
-    publishedAt: "2024-10-15T14:20:00Z",
-    author: {
-      name: "Sophie Leroy",
-      role: "Psycho-oncologue"
-    },
-    isFeatured: false,
-    views: 892,
-    likes: 67
-  },
-  {
-    _id: "4",
-    title: "Exercices adaptés pendant et après le traitement du cancer",
-    excerpt: "Un programme d'exercices doux et adaptés pour maintenir votre forme physique en toute sécurité.",
-    content: "Guide complet d'exercices adaptés pour maintenir votre forme physique pendant et après le traitement du cancer.",
-    image: "/yoga-gentle-exercise.jpg",
-    slug: "exercices-traitement-cancer",
-    category: "Activité physique",
-    readTime: 7,
-    publishedAt: "2024-10-12T11:45:00Z",
-    author: {
-      name: "Marc Dupont",
-      role: "Kinésithérapeute spécialisé"
-    },
-    isFeatured: false,
-    views: 756,
-    likes: 45
-  },
-  {
-    _id: "5",
-    title: "Comprendre les effets secondaires de la chimiothérapie",
-    excerpt: "Guide complet pour anticiper et gérer les effets secondaires les plus courants de la chimiothérapie.",
-    content: "Tout ce que vous devez savoir sur les effets secondaires de la chimiothérapie et comment les gérer efficacement.",
-    image: "/medical-science-laboratory.jpg",
-    slug: "effets-secondaires-chimiotherapie",
-    category: "Traitement",
-    readTime: 9,
-    publishedAt: "2024-10-10T16:00:00Z",
-    author: {
-      name: "Dr. Anne Moreau",
-      role: "Oncologue médicale"
-    },
-    isFeatured: false,
-    views: 1567,
-    likes: 112
-  },
-  {
-    _id: "6",
-    title: "Comment parler de votre cancer à vos proches",
-    excerpt: "Conseils pratiques pour communiquer efficacement avec votre famille et vos amis sur votre diagnostic.",
-    content: "Guide pratique pour vous aider à communiquer avec vos proches au sujet de votre diagnostic de cancer.",
-    image: "/doctor-patient-conversation.png",
-    slug: "parler-cancer-proches",
-    category: "Support",
-    readTime: 6,
-    publishedAt: "2024-10-08T13:15:00Z",
-    author: {
-      name: "Claire Petit",
-      role: "Assistante sociale"
-    },
-    isFeatured: false,
-    views: 1023,
-    likes: 78
-  }
-]
-
 export default function ArticlePage() {
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
   const [article, setArticle] = useState<Article | null>(null)
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [liked, setLiked] = useState(false)
+  const [bookmarked, setBookmarked] = useState(false)
 
   useEffect(() => {
-    // Simuler le chargement de l'article
     const fetchArticle = async () => {
-      setLoading(true)
-      
-      // Simulation d'un délai API
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      const foundArticle = mockArticles.find(a => a.slug === slug)
-      setArticle(foundArticle || null)
-      setLoading(false)
+      try {
+        setLoading(true)
+        
+        // Récupérer l'article par slug depuis l'API
+        const response = await fetch(`/api/articles?search=${slug}&limit=1`)
+        const data = await response.json()
+        
+        if (data.articles && data.articles.length > 0) {
+          const foundArticle = data.articles[0]
+          setArticle(foundArticle)
+          
+          // Incrémenter le compteur de vues
+          await fetch(`/api/articles/${foundArticle._id}/view`, { method: 'POST' })
+          
+          // Récupérer les articles similaires (même catégorie)
+          const relatedResponse = await fetch(`/api/articles?category=${foundArticle.category}&limit=4`)
+          const relatedData = await relatedResponse.json()
+          
+          // Filtrer pour exclure l'article actuel
+          const filtered = relatedData.articles?.filter((a: Article) => a._id !== foundArticle._id).slice(0, 3) || []
+          setRelatedArticles(filtered)
+        } else {
+          setArticle(null)
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement de l\'article:', error)
+        setArticle(null)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    fetchArticle()
+    if (slug) {
+      fetchArticle()
+    }
   }, [slug])
 
   const formatDate = (dateString: string) => {
@@ -172,9 +88,28 @@ export default function ArticlePage() {
     })
   }
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    if (!article) return
     setLiked(!liked)
-    // Ici on pourrait envoyer une requête à l'API pour enregistrer le like
+    // Enregistrer le like dans l'API
+    try {
+      await fetch(`/api/articles/${article._id}/like`, { method: 'POST' })
+    } catch (error) {
+      console.error('Erreur lors du like:', error)
+    }
+  }
+
+  const handleBookmark = () => {
+    setBookmarked(!bookmarked)
+    // Sauvegarder dans localStorage
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarkedArticles') || '[]')
+    if (!bookmarked && article) {
+      bookmarks.push(article._id)
+    } else {
+      const index = bookmarks.indexOf(article?._id)
+      if (index > -1) bookmarks.splice(index, 1)
+    }
+    localStorage.setItem('bookmarkedArticles', JSON.stringify(bookmarks))
   }
 
   const handleShare = async () => {
@@ -307,6 +242,13 @@ export default function ArticlePage() {
                   <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
                   <span>{liked ? article.likes + 1 : article.likes}</span>
                 </Button>
+                <Button 
+                  variant={bookmarked ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={handleBookmark}
+                >
+                  <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} />
+                </Button>
                 <Button variant="outline" size="sm" onClick={handleShare}>
                   <Share2 className="w-4 h-4 mr-2" />
                   Partager
@@ -317,27 +259,94 @@ export default function ArticlePage() {
             <CardContent>
               <Separator className="mb-6" />
               
-              {/* Contenu de l'article */}
-              <div className="prose prose-gray max-w-none">
-                <div className="text-gray-800 leading-relaxed space-y-4">
-                  {article.content}
-                </div>
+              {/* Contenu de l'article avec rendu HTML */}
+              <div className="prose prose-lg prose-gray max-w-none">
+                <div 
+                  className="text-gray-800 leading-relaxed article-content"
+                  dangerouslySetInnerHTML={{ __html: article.content }}
+                />
               </div>
+
+              {/* Tags */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Tags :</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {article.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary" className="cursor-pointer hover:bg-primary/10">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Informations sur l'auteur */}
               <Separator className="my-8" />
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">À propos de l'auteur</h3>
+              <div className="bg-muted/50 rounded-lg p-6">
+                <h3 className="font-semibold text-foreground mb-2">À propos de l'auteur</h3>
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                    {article.author.name.split(' ').map(n => n[0]).join('')}
-                  </div>
+                  {article.author.avatar ? (
+                    <Image
+                      src={article.author.avatar}
+                      alt={article.author.name}
+                      width={48}
+                      height={48}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 bg-linear-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-semibold">
+                      {article.author.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                  )}
                   <div>
-                    <p className="font-medium text-gray-900">{article.author.name}</p>
-                    <p className="text-gray-600">{article.author.role}</p>
+                    <p className="font-medium text-foreground">{article.author.name}</p>
+                    <p className="text-muted-foreground">{article.author.role}</p>
                   </div>
                 </div>
               </div>
+
+              {/* Articles similaires */}
+              {relatedArticles.length > 0 && (
+                <>
+                  <Separator className="my-8" />
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">Articles similaires</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {relatedArticles.map((relatedArticle) => (
+                        <Link 
+                          key={relatedArticle._id} 
+                          href={`/articles/${relatedArticle.slug}`}
+                          className="group"
+                        >
+                          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                            <div className="relative h-32">
+                              <Image
+                                src={relatedArticle.image}
+                                alt={relatedArticle.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform"
+                              />
+                            </div>
+                            <CardContent className="p-4">
+                              <Badge variant="secondary" className="mb-2 text-xs">
+                                {relatedArticle.category}
+                              </Badge>
+                              <h4 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                                {relatedArticle.title}
+                              </h4>
+                              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                                <Clock className="w-3 h-3" />
+                                <span>{relatedArticle.readTime} min</span>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </article>

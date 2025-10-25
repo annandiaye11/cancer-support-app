@@ -394,6 +394,316 @@ async function seedDatabase() {
           metaDescription: "Techniques et conseils pour gérer le stress et l'anxiété pendant un parcours cancer.",
           keywords: ["stress cancer", "anxiété cancer", "soutien psychologique", "relaxation"]
         }
+      },
+      {
+        title: "L'activité physique pendant et après le cancer",
+        slug: "activite-physique-cancer",
+        content: `
+<h2>L'activité physique pendant et après le cancer</h2>
+
+<p>L'activité physique adaptée est aujourd'hui recommandée pendant et après un traitement contre le cancer. Elle apporte de nombreux bénéfices pour le corps et l'esprit.</p>
+
+<h3>Les bienfaits prouvés</h3>
+
+<h4>Pendant le traitement</h4>
+<ul>
+<li>Réduit la fatigue (contrairement aux idées reçues)</li>
+<li>Améliore la tolérance aux traitements</li>
+<li>Maintient la masse musculaire</li>
+<li>Réduit l'anxiété et la dépression</li>
+<li>Améliore la qualité de vie</li>
+</ul>
+
+<h4>Après le traitement</h4>
+<ul>
+<li>Réduit le risque de récidive (jusqu'à 40% pour certains cancers)</li>
+<li>Améliore les chances de survie</li>
+<li>Aide à retrouver la forme physique</li>
+<li>Favorise la reprise d'une vie normale</li>
+</ul>
+
+<h3>Quels types d'activités ?</h3>
+
+<h4>Activités d'endurance (cardio)</h4>
+<ul>
+<li>Marche rapide</li>
+<li>Vélo</li>
+<li>Natation</li>
+<li>Danse</li>
+</ul>
+
+<h4>Renforcement musculaire</h4>
+<ul>
+<li>Exercices avec poids légers</li>
+<li>Élastiques</li>
+<li>Poids du corps</li>
+<li>Pilates</li>
+</ul>
+
+<h4>Souplesse et équilibre</h4>
+<ul>
+<li>Yoga</li>
+<li>Tai-chi</li>
+<li>Stretching</li>
+</ul>
+
+<h3>Recommandations</h3>
+<p>Pour les adultes pendant et après le traitement :</p>
+<ul>
+<li>150 minutes d'activité modérée par semaine</li>
+<li>OU 75 minutes d'activité intense</li>
+<li>2 séances de renforcement musculaire</li>
+<li>Réduire le temps assis</li>
+</ul>
+
+<h3>Précautions importantes</h3>
+<ul>
+<li>Toujours consulter son oncologue avant</li>
+<li>Commencer progressivement</li>
+<li>Adapter selon la fatigue</li>
+<li>Éviter les contacts violents pendant certains traitements</li>
+<li>Idéalement, travailler avec un professionnel APA (Activité Physique Adaptée)</li>
+</ul>
+
+<p><strong>L'essentiel :</strong> Bouger, c'est déjà beaucoup ! Même 10 minutes par jour ont un impact positif.</p>
+        `,
+        excerpt: "Découvrez pourquoi et comment l'activité physique est bénéfique pendant et après un cancer.",
+        category: "Bien-être",
+        tags: ["activité physique", "sport", "exercice", "récupération", "prévention"],
+        author: {
+          name: "Dr. Marc Sport",
+          role: "Médecin du sport",
+          avatar: "/placeholder-user.jpg"
+        },
+        image: "/exercise-prevention-health.jpg",
+        readTime: 8,
+        isPublished: true,
+        isFeatured: true,
+        views: 892,
+        likes: 102,
+        publishedAt: new Date(Date.now() - 96 * 60 * 60 * 1000), // Il y a 4 jours
+        seo: {
+          metaTitle: "Activité physique et cancer | CareCompanion",
+          metaDescription: "Les bienfaits de l'activité physique pendant et après le traitement du cancer.",
+          keywords: ["activité physique cancer", "sport cancer", "exercice traitement"]
+        }
+      },
+      {
+        title: "Communiquer avec son équipe médicale",
+        slug: "communiquer-equipe-medicale",
+        content: `
+<h2>Communiquer efficacement avec son équipe médicale</h2>
+
+<p>Une bonne communication avec votre équipe médicale est essentielle pour un parcours de soins optimal. Voici comment optimiser vos consultations.</p>
+
+<h3>Préparer sa consultation</h3>
+
+<h4>Avant le rendez-vous</h4>
+<ul>
+<li>Notez vos questions à l'avance</li>
+<li>Listez vos symptômes et leur évolution</li>
+<li>Apportez vos derniers examens</li>
+<li>Notez vos traitements actuels</li>
+<li>Venez accompagné(e) si possible</li>
+</ul>
+
+<h4>Questions importantes à poser</h4>
+<ul>
+<li>Quel est exactement mon diagnostic ?</li>
+<li>Quelles sont mes options de traitement ?</li>
+<li>Quels sont les effets secondaires possibles ?</li>
+<li>Comment puis-je les gérer ?</li>
+<li>Quand dois-je vous contacter en cas de problème ?</li>
+</ul>
+
+<h3>Pendant la consultation</h3>
+
+<h4>Prendre des notes</h4>
+<p>N'hésitez pas à écrire ou enregistrer (avec permission) pour ne rien oublier.</p>
+
+<h4>Demander des éclaircissements</h4>
+<p>Si vous ne comprenez pas un terme médical, demandez une explication en langage simple.</p>
+
+<h4>Exprimer vos préoccupations</h4>
+<p>Vos inquiétudes, même si elles vous semblent insignifiantes, méritent d'être entendues.</p>
+
+<h3>Construire une relation de confiance</h3>
+
+<h4>Soyez honnête</h4>
+<p>Partagez toutes les informations, même embarrassantes. Votre médecin est là pour vous aider, pas pour juger.</p>
+
+<h4>Respectez les recommandations</h4>
+<p>Si vous ne pouvez pas suivre un traitement, expliquez pourquoi plutôt que de l'arrêter sans en parler.</p>
+
+<h4>Donnez votre feedback</h4>
+<p>Informez l'équipe de ce qui fonctionne ou non pour vous.</p>
+
+<h3>Vos droits</h3>
+<ul>
+<li>Droit à l'information claire et compréhensible</li>
+<li>Droit de refuser un traitement</li>
+<li>Droit d'avoir un second avis</li>
+<li>Droit d'accéder à votre dossier médical</li>
+<li>Droit d'être accompagné(e)</li>
+</ul>
+
+<h3>Ressources utiles</h3>
+<ul>
+<li>Infirmière de coordination</li>
+<li>Assistante sociale</li>
+<li>Psychologue</li>
+<li>Associations de patients</li>
+</ul>
+
+<h3>Demander un second avis</h3>
+<p>C'est votre droit ! Cela ne vexera pas votre médecin et peut vous apporter :</p>
+<ul>
+<li>Confirmation du diagnostic</li>
+<li>Autres options thérapeutiques</li>
+<li>Réassurance</li>
+</ul>
+
+<p><strong>Rappelez-vous :</strong> Vous êtes au centre de votre parcours de soins. Une communication ouverte favorise de meilleurs résultats.</p>
+        `,
+        excerpt: "Conseils pratiques pour optimiser la communication avec votre équipe médicale.",
+        category: "Soutien psychologique",
+        tags: ["communication", "équipe médicale", "consultation", "droits", "parcours soins"],
+        author: {
+          name: "Dr. Alice Patient",
+          role: "Médecin coordinateur",
+          avatar: "/placeholder-user.jpg"
+        },
+        image: "/doctor-patient-consultation.jpg",
+        readTime: 7,
+        isPublished: true,
+        isFeatured: false,
+        views: 543,
+        likes: 67,
+        publishedAt: new Date(Date.now() - 120 * 60 * 60 * 1000), // Il y a 5 jours
+        seo: {
+          metaTitle: "Communication équipe médicale | CareCompanion",
+          metaDescription: "Comment optimiser la communication avec votre équipe médicale pendant le parcours cancer.",
+          keywords: ["communication médecin", "consultation", "droits patients"]
+        }
+      },
+      {
+        title: "Gérer la fatigue liée au cancer",
+        slug: "gerer-fatigue-cancer",
+        content: `
+<h2>Gérer la fatigue liée au cancer</h2>
+
+<p>La fatigue est l'un des effets secondaires les plus fréquents du cancer et de ses traitements. Contrairement à la fatigue normale, elle ne disparaît pas avec le repos. Voici comment la gérer.</p>
+
+<h3>Comprendre la fatigue cancéreuse</h3>
+
+<h4>Qu'est-ce que c'est ?</h4>
+<p>C'est une fatigue intense, persistante et disproportionnée par rapport à l'activité. Elle affecte :</p>
+<ul>
+<li>Le corps (faiblesse physique)</li>
+<li>L'esprit (difficulté de concentration)</li>
+<li>Les émotions (irritabilité)</li>
+</ul>
+
+<h4>Les causes</h4>
+<ul>
+<li>Le cancer lui-même</li>
+<li>Les traitements (chimio, radio)</li>
+<li>L'anémie</li>
+<li>Les troubles du sommeil</li>
+<li>La douleur</li>
+<li>Le stress et l'anxiété</li>
+<li>Les déséquilibres nutritionnels</li>
+</ul>
+
+<h3>5 stratégies pour mieux gérer</h3>
+
+<h4>1. Conserver son énergie</h4>
+<ul>
+<li>Priorisez les activités importantes</li>
+<li>Déléguez quand c'est possible</li>
+<li>Planifiez les tâches importantes aux moments où vous avez plus d'énergie</li>
+<li>Évitez le perfectionnisme</li>
+</ul>
+
+<h4>2. Rester actif (paradoxalement !)</h4>
+<ul>
+<li>L'activité physique douce réduit la fatigue</li>
+<li>Commencez par 5-10 minutes par jour</li>
+<li>Marche, yoga, natation</li>
+<li>Augmentez progressivement</li>
+</ul>
+
+<h4>3. Optimiser le sommeil</h4>
+<ul>
+<li>Horaires réguliers</li>
+<li>Environnement calme et sombre</li>
+<li>Éviter écrans 1h avant le coucher</li>
+<li>Siestes courtes (20-30 min max)</li>
+<li>Relaxation avant de dormir</li>
+</ul>
+
+<h4>4. Adapter l'alimentation</h4>
+<ul>
+<li>Repas légers et fréquents</li>
+<li>Protéines à chaque repas</li>
+<li>Hydratation suffisante</li>
+<li>Limiter sucres raffinés</li>
+<li>Fer et vitamines si besoin</li>
+</ul>
+
+<h4>5. Demander de l'aide</h4>
+<ul>
+<li>Parlez-en à votre équipe médicale</li>
+<li>Acceptez l'aide des proches</li>
+<li>Consultez un psychologue si besoin</li>
+<li>Traitements possibles (selon la cause)</li>
+</ul>
+
+<h3>Quand consulter ?</h3>
+<p>Contactez votre équipe si :</p>
+<ul>
+<li>La fatigue empire soudainement</li>
+<li>Elle vous empêche de faire vos activités essentielles</li>
+<li>Vous avez des vertiges ou essoufflement</li>
+<li>Vous êtes confus(e) ou désorienté(e)</li>
+</ul>
+
+<h3>Outils pratiques</h3>
+
+<h4>Journal de fatigue</h4>
+<p>Notez chaque jour :</p>
+<ul>
+<li>Niveau de fatigue (échelle 0-10)</li>
+<li>Activités réalisées</li>
+<li>Heures de sommeil</li>
+<li>Facteurs aggravants</li>
+</ul>
+
+<h4>Techniques de respiration</h4>
+<p>3-5 minutes de respiration profonde peuvent redonner de l'énergie.</p>
+
+<p><strong>Important :</strong> La fatigue diminue généralement progressivement après la fin des traitements, mais cela peut prendre plusieurs mois.</p>
+        `,
+        excerpt: "Stratégies concrètes pour gérer la fatigue intense liée au cancer et à ses traitements.",
+        category: "Traitement",
+        tags: ["fatigue", "effets secondaires", "gestion", "bien-être", "traitement"],
+        author: {
+          name: "Dr. Julie Énergie",
+          role: "Oncologue",
+          avatar: "/placeholder-user.jpg"
+        },
+        image: "/person-resting-tired.jpg",
+        readTime: 9,
+        isPublished: true,
+        isFeatured: false,
+        views: 723,
+        likes: 84,
+        publishedAt: new Date(Date.now() - 144 * 60 * 60 * 1000), // Il y a 6 jours
+        seo: {
+          metaTitle: "Gérer la fatigue du cancer | CareCompanion",
+          metaDescription: "Conseils et stratégies pour mieux gérer la fatigue intense pendant le traitement du cancer.",
+          keywords: ["fatigue cancer", "effets secondaires", "chimiothérapie fatigue"]
+        }
       }
     ]
 
