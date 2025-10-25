@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { CheckCircle2, Circle } from "lucide-react"
+import { CheckCircle2, Circle, ChevronRight, Clock, TrendingUp } from "lucide-react"
 import { useState } from "react"
 
 interface HomeSectionProps {
@@ -12,38 +12,107 @@ interface HomeSectionProps {
     mode: "preventive" | "curative"
     age: number
   }
+  onViewAllArticles?: () => void
+  onArticleClick?: (articleId: number) => void
 }
 
-export function HomeSection({ userProfile }: HomeSectionProps) {
+export function HomeSection({ userProfile, onViewAllArticles, onArticleClick }: HomeSectionProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [screenings, setScreenings] = useState<Record<string, boolean>>({
     "2025-01": false,
     "2025-02": false,
     "2025-03": false,
   })
-  const [articles] = useState([
-    {
-      id: 1,
-      title: "Les 10 habitudes pour réduire les risques",
-      category: "Prévention",
-      image: "/healthy-lifestyle-prevention.jpg",
-      readTime: "5 min",
-    },
-    {
-      id: 2,
-      title: "Comprendre le dépistage précoce",
-      category: "Dépistage",
-      image: "/medical-screening-checkup.jpg",
-      readTime: "7 min",
-    },
-    {
-      id: 3,
-      title: "Alimentation et prévention du cancer",
-      category: "Nutrition",
-      image: "/healthy-food-nutrition.png",
-      readTime: "6 min",
-    },
-  ])
+  
+  // Articles recommandés selon le genre et le mode
+  const getRecommendedArticles = () => {
+    const commonArticles = [
+      {
+        id: 1,
+        title: "Les aliments anti-cancer à privilégier",
+        category: "Nutrition",
+        excerpt: "Découvrez les aliments riches en antioxydants",
+        image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400",
+        readTime: "8 min",
+        trending: true,
+      },
+      {
+        id: 5,
+        title: "L'importance de l'activité physique",
+        category: "Prévention",
+        excerpt: "Pourquoi bouger régulièrement est essentiel",
+        image: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400",
+        readTime: "7 min",
+        trending: true,
+      },
+    ]
+
+    const femaleArticles = [
+      {
+        id: 2,
+        title: "Comprendre les différents types de dépistage",
+        category: "Dépistage",
+        excerpt: "Guide complet des examens recommandés",
+        image: "/medical-screening-healthcare.jpg",
+        readTime: "12 min",
+        trending: true,
+      },
+      ...commonArticles,
+    ]
+
+    const maleArticles = [
+      {
+        id: 2,
+        title: "Comprendre les différents types de dépistage",
+        category: "Dépistage",
+        excerpt: "Guide complet des examens recommandés",
+        image: "/medical-screening-healthcare.jpg",
+        readTime: "12 min",
+        trending: true,
+      },
+      ...commonArticles,
+    ]
+
+    const preventiveArticles = [
+      {
+        id: 2,
+        title: "Comprendre les différents types de dépistage",
+        category: "Prévention",
+        excerpt: "Guide complet des examens recommandés",
+        image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=400",
+        readTime: "12 min",
+        trending: false,
+      },
+    ]
+
+    const curativeArticles = [
+      {
+        id: 3,
+        title: "Gérer la fatigue pendant le traitement",
+        category: "Traitement",
+        excerpt: "Conseils pratiques pour mieux gérer la fatigue",
+        image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400",
+        readTime: "6 min",
+        trending: false,
+      },
+      {
+        id: 4,
+        title: "Méditation et cancer : les bienfaits prouvés",
+        category: "Bien-être",
+        excerpt: "Comment la méditation améliore votre qualité de vie",
+        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400",
+        readTime: "10 min",
+        trending: false,
+      },
+    ]
+
+    const genderArticles = userProfile.gender === "female" ? femaleArticles : maleArticles
+    const modeArticles = userProfile.mode === "preventive" ? preventiveArticles : curativeArticles
+    
+    return [...genderArticles.slice(0, 2), ...modeArticles.slice(0, 2)]
+  }
+
+  const [articles] = useState(getRecommendedArticles())
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear()
@@ -143,6 +212,56 @@ export function HomeSection({ userProfile }: HomeSectionProps) {
                 </label>
               </div>
             )}
+            {userProfile.age >= 50 && (
+              <div className="flex items-center gap-3 mt-3">
+                <Checkbox id="colorectal" />
+                <label htmlFor="colorectal" className="text-sm text-muted-foreground cursor-pointer">
+                  Dépistage cancer colorectal (tous les 2 ans)
+                </label>
+              </div>
+            )}
+          </div>
+        )}
+
+        {userProfile.gender === "male" && (
+          <div className="mt-4 pt-4 border-t border-border space-y-3">
+            {userProfile.age >= 50 && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      id={`screening-${monthKey}`}
+                      checked={screenings[monthKey] || false}
+                      onCheckedChange={() => toggleScreening(monthKey)}
+                    />
+                    <label htmlFor={`screening-${monthKey}`} className="text-sm font-medium text-foreground cursor-pointer">
+                      Test PSA prostate (annuel)
+                    </label>
+                  </div>
+                  {screenings[monthKey] && <CheckCircle2 className="w-5 h-5 text-primary" />}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Checkbox id="colorectal-m" />
+                  <label htmlFor="colorectal-m" className="text-sm text-muted-foreground cursor-pointer">
+                    Dépistage cancer colorectal (tous les 2 ans)
+                  </label>
+                </div>
+              </>
+            )}
+            {userProfile.age >= 15 && (
+              <div className="flex items-center gap-3">
+                <Checkbox id="testicular" />
+                <label htmlFor="testicular" className="text-sm text-muted-foreground cursor-pointer">
+                  Auto-examen testiculaire mensuel
+                </label>
+              </div>
+            )}
+            <div className="flex items-center gap-3">
+              <Checkbox id="skin-check-m" />
+              <label htmlFor="skin-check-m" className="text-sm text-muted-foreground cursor-pointer">
+                Surveillance de la peau (tous les 6 mois)
+              </label>
+            </div>
           </div>
         )}
       </Card>
@@ -151,29 +270,50 @@ export function HomeSection({ userProfile }: HomeSectionProps) {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">Articles recommandés</h3>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-1"
+            onClick={onViewAllArticles}
+          >
             Voir tout
+            <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
           {articles.map((article) => (
             <Card
               key={article.id}
-              className="shrink-0 w-[280px] overflow-hidden hover:shadow-lg transition-shadow cursor-pointer snap-start"
+              className="shrink-0 w-[280px] overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer snap-start group"
+              onClick={() => onArticleClick?.(article.id)}
             >
-              <div className="aspect-video bg-linear-to-br from-primary/20 to-accent/20 relative">
+              <div className="aspect-video bg-linear-to-br from-primary/20 to-accent/20 relative overflow-hidden">
                 <img
-                  src={article.image || "/placeholder.svg"}
+                  src={article.image}
                   alt={article.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {article.trending && (
+                  <div className="absolute top-2 left-2">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>Populaire</span>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="p-4">
                 <div className="inline-block px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-2">
                   {article.category}
                 </div>
-                <h4 className="font-semibold text-foreground mb-2 line-clamp-2">{article.title}</h4>
-                <p className="text-xs text-muted-foreground">{article.readTime} de lecture</p>
+                <h4 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                  {article.title}
+                </h4>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{article.excerpt}</p>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="w-3 h-3" />
+                  <span>{article.readTime} de lecture</span>
+                </div>
               </div>
             </Card>
           ))}

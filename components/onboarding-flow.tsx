@@ -23,13 +23,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#212E53] via-slate-100 to-sky-50 dark:from-[#212E53] dark:via-slate-900 dark:to-sky-950/20 p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Heart className="w-8 h-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-[#212E53] to-sky-500 mb-4 shadow-lg">
+            <Heart className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">CareCompanion</h1>
+          <h1 className="text-4xl font-bold bg-linear-to-r from-[#212E53] to-sky-600 bg-clip-text text-transparent mb-2">CareCompanion</h1>
           <p className="text-muted-foreground text-lg">Votre allié dans la prévention et l'accompagnement</p>
         </div>
 
@@ -45,22 +45,24 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setGender("female")}
-                  className={`p-6 rounded-xl border-2 transition-all hover:scale-105 ${
+                  className={`p-6 rounded-xl border-2 transition-all hover:scale-105 shadow-md ${
                     gender === "female"
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card hover:border-primary/50"
+                      ? "border-[#212E53] bg-[#212E53]/10 dark:bg-[#212E53]/30 shadow-[#212E53]/20 dark:shadow-[#212E53]/40"
+                      : "border-border bg-card hover:border-[#212E53]/50 dark:hover:border-[#212E53]/70"
                   }`}
                 >
-                  <User className="w-8 h-8 mx-auto mb-3 text-primary" />
+                  <User className={`w-8 h-8 mx-auto mb-3 ${gender === "female" ? "text-[#212E53]" : "text-muted-foreground"}`} />
                   <p className="font-medium text-foreground">Une femme</p>
                 </button>
                 <button
                   onClick={() => setGender("male")}
-                  className={`p-6 rounded-xl border-2 transition-all hover:scale-105 ${
-                    gender === "male" ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"
+                  className={`p-6 rounded-xl border-2 transition-all hover:scale-105 shadow-md ${
+                    gender === "male" 
+                      ? "border-[#212E53] bg-[#212E53]/10 dark:bg-[#212E53]/30 shadow-[#212E53]/20 dark:shadow-[#212E53]/40" 
+                      : "border-border bg-card hover:border-[#212E53]/50 dark:hover:border-[#212E53]/70"
                   }`}
                 >
-                  <Users className="w-8 h-8 mx-auto mb-3 text-primary" />
+                  <Users className={`w-8 h-8 mx-auto mb-3 ${gender === "male" ? "text-[#212E53]" : "text-muted-foreground"}`} />
                   <p className="font-medium text-foreground">Un homme</p>
                 </button>
               </div>
@@ -82,15 +84,15 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             <div className="space-y-4">
               <button
                 onClick={() => setMode("preventive")}
-                className={`w-full p-6 rounded-xl border-2 transition-all hover:scale-[1.02] text-left ${
+                className={`w-full p-6 rounded-xl border-2 transition-all hover:scale-[1.02] text-left shadow-md ${
                   mode === "preventive"
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-card hover:border-primary/50"
+                    ? "border-[#212E53] bg-[#212E53]/10 dark:bg-[#212E53]/30 shadow-[#212E53]/20 dark:shadow-[#212E53]/40"
+                    : "border-border bg-card hover:border-[#212E53]/50 dark:hover:border-[#212E53]/70"
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-accent/20">
-                    <Shield className="w-6 h-6 text-accent" />
+                  <div className={`p-3 rounded-lg ${mode === "preventive" ? "bg-[#212E53]/20 dark:bg-[#212E53]/40" : "bg-accent/20"}`}>
+                    <Shield className={`w-6 h-6 ${mode === "preventive" ? "text-[#212E53]" : "text-accent"}`} />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-foreground mb-1">Mode Préventif</h3>
@@ -104,13 +106,15 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
               <button
                 onClick={() => setMode("curative")}
-                className={`w-full p-6 rounded-xl border-2 transition-all hover:scale-[1.02] text-left ${
-                  mode === "curative" ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"
+                className={`w-full p-6 rounded-xl border-2 transition-all hover:scale-[1.02] text-left shadow-md ${
+                  mode === "curative"
+                    ? "border-sky-500 bg-sky-50 dark:bg-sky-950/30 shadow-sky-200 dark:shadow-sky-900"
+                    : "border-border bg-card hover:border-sky-300 dark:hover:border-sky-700"
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-primary/20">
-                    <Heart className="w-6 h-6 text-primary" />
+                  <div className={`p-3 rounded-lg ${mode === "curative" ? "bg-sky-100 dark:bg-sky-900/50" : "bg-accent/20"}`}>
+                    <Heart className={`w-6 h-6 ${mode === "curative" ? "text-sky-600" : "text-accent"}`} />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-foreground mb-1">Mode Curatif</h3>
@@ -149,7 +153,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <Input
                   id="age"
                   type="number"
-                  min="18"
+                  min="1"
                   max="120"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
@@ -168,7 +172,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </Button>
               <Button
                 onClick={handleComplete}
-                disabled={!age || Number.parseInt(age) < 18}
+                disabled={!age || Number.parseInt(age) < 1 || Number.parseInt(age) > 120}
                 className="flex-1"
                 size="lg"
               >
@@ -179,9 +183,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         )}
 
         <div className="flex justify-center gap-2 mt-6">
-          <div className={`w-2 h-2 rounded-full transition-all ${step === 1 ? "bg-primary w-8" : "bg-border"}`} />
-          <div className={`w-2 h-2 rounded-full transition-all ${step === 2 ? "bg-primary w-8" : "bg-border"}`} />
-          <div className={`w-2 h-2 rounded-full transition-all ${step === 3 ? "bg-primary w-8" : "bg-border"}`} />
+          <div className={`h-2 rounded-full transition-all ${step === 1 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
+          <div className={`h-2 rounded-full transition-all ${step === 2 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
+          <div className={`h-2 rounded-full transition-all ${step === 3 ? "bg-purple-500 w-8" : "bg-gray-300 dark:bg-gray-700 w-2"}`} />
         </div>
       </div>
     </div>

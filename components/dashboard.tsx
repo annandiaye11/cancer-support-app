@@ -8,6 +8,9 @@ import { VideosSection } from "@/components/videos-section"
 import { HomeSection } from "@/components/home-section"
 import { CalendarSection } from "@/components/calendar-section"
 import { ProfileSection } from "@/components/profile-section"
+import { AiPsyChat } from "@/components/ai-psy-chat"
+import { AppointmentsSection } from "@/components/appointments-section"
+import { PreventionVideosSection } from "@/components/prevention-videos-section"
 
 interface DashboardProps {
   userProfile: {
@@ -21,13 +24,26 @@ export function Dashboard({ userProfile }: DashboardProps) {
   const [activeTab, setActiveTab] = useState("home")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const navigation = [
+  // Navigation adaptée selon le mode
+  const navigationPreventive = [
     { id: "home", label: "Accueil", icon: Home },
-    { id: "articles", label: "Articles", icon: BookOpen },
+    { id: "calendar", label: "Dépistages", icon: Calendar },
     { id: "videos", label: "Vidéos", icon: Video },
-    { id: "calendar", label: "Calendrier", icon: Calendar },
+    { id: "articles", label: "Guides", icon: BookOpen },
+    { id: "appointments", label: "RDV", icon: Calendar },
     { id: "profile", label: "Profil", icon: User },
   ]
+
+  const navigationCurative = [
+    { id: "home", label: "Accueil", icon: Home },
+    { id: "ai-psy", label: "Psy IA", icon: Heart },
+    { id: "videos", label: "Témoignages", icon: Video },
+    { id: "appointments", label: "Rendez-vous", icon: Calendar },
+    { id: "articles", label: "Infos", icon: BookOpen },
+    { id: "profile", label: "Profil", icon: User },
+  ]
+
+  const navigation = userProfile.mode === "preventive" ? navigationPreventive : navigationCurative
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,11 +52,19 @@ export function Dashboard({ userProfile }: DashboardProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                userProfile.gender === "female" 
+                  ? "bg-pink-100 dark:bg-pink-950/30" 
+                  : "bg-blue-100 dark:bg-blue-950/30"
+              }`}>
                 {userProfile.mode === "preventive" ? (
-                  <Shield className="w-5 h-5 text-primary" />
+                  <Shield className={`w-5 h-5 ${
+                    userProfile.gender === "female" ? "text-pink-600" : "text-blue-600"
+                  }`} />
                 ) : (
-                  <Heart className="w-5 h-5 text-primary" />
+                  <Heart className={`w-5 h-5 ${
+                    userProfile.gender === "female" ? "text-pink-600" : "text-blue-600"
+                  }`} />
                 )}
               </div>
               <div>
@@ -118,10 +142,25 @@ export function Dashboard({ userProfile }: DashboardProps) {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 md:py-8">
-        {activeTab === "home" && <HomeSection userProfile={userProfile} />}
+        {activeTab === "home" && (
+          <HomeSection 
+            userProfile={userProfile} 
+            onViewAllArticles={() => setActiveTab("articles")}
+            onArticleClick={(articleId) => {
+              setActiveTab("articles")
+              // L'article sera ouvert dans ArticlesSection
+            }}
+          />
+        )}
         {activeTab === "articles" && <ArticlesSection userProfile={userProfile} />}
-        {activeTab === "videos" && <VideosSection userProfile={userProfile} />}
+        {activeTab === "videos" && (
+          userProfile.mode === "preventive" 
+            ? <PreventionVideosSection userProfile={userProfile} />
+            : <VideosSection userProfile={userProfile} />
+        )}
+        {activeTab === "ai-psy" && <AiPsyChat userProfile={userProfile} />}
         {activeTab === "calendar" && <CalendarSection userProfile={userProfile} />}
+        {activeTab === "appointments" && <AppointmentsSection userProfile={userProfile} />}
         {activeTab === "profile" && <ProfileSection userProfile={userProfile} />}
       </main>
 
