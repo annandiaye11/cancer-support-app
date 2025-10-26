@@ -94,9 +94,13 @@ export function ProfileSection() {
 
   const handleLogout = () => {
     if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+      // Supprimer toutes les données de session
       localStorage.removeItem('userProfile')
       localStorage.removeItem('isOnboarded')
-      window.location.reload()
+      localStorage.removeItem('authToken')
+      
+      // Redirection vers la page d'accueil
+      window.location.href = '/'
     }
   }
 

@@ -111,8 +111,7 @@ const UserSchema = new Schema<IUser>({
   timestamps: true
 })
 
-// Index pour améliorer les performances
-UserSchema.index({ email: 1 })
+// Index pour améliorer les performances (email a déjà un index unique)
 UserSchema.index({ role: 1 })
 UserSchema.index({ isActive: 1 })
 

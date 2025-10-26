@@ -12,11 +12,14 @@ import { ProfileSection } from "@/components/profile-section"
 import { AiPsyChat } from "@/components/ai-psy-chat"
 import { AppointmentsSection } from "@/components/appointments-section"
 import { PreventionVideosSection } from "@/components/prevention-videos-section"
+import { WelcomeHeader } from "@/components/welcome-header"
 import Link from "next/link"
 
 interface DashboardProps {
   userProfile: {
     userId: string
+    name: string
+    email: string
     gender: "male" | "female"
     mode: "preventive" | "curative"
     age: number
@@ -163,12 +166,15 @@ export function Dashboard({ userProfile }: DashboardProps) {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 md:py-8">
+            {/* Main Content */}
+      <main className="flex-1 bg-background">
         {activeTab === "home" && (
-          <HomeSection 
-            userProfile={userProfile}
-          />
+          <div className="space-y-6">
+            <WelcomeHeader userProfile={userProfile} />
+            <HomeSection 
+              userProfile={userProfile}
+            />
+          </div>
         )}
         {activeTab === "videos" && (
           userProfile.mode === "preventive" 

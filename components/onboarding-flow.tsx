@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Heart, Shield, User, Users, Mail, UserCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Heart, Shield, User, Users, Mail, UserCircle, AlertCircle, Lock, Eye, EyeOff } from "lucide-react"
 
 interface OnboardingFlowProps {
   onComplete: (profile: { 
@@ -21,11 +23,53 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(1)
   const [name, setName] = useState<string>("")
   const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
   const [gender, setGender] = useState<"male" | "female" | null>(null)
   const [mode, setMode] = useState<"preventive" | "curative" | null>(null)
   const [age, setAge] = useState<string>("")
   const [isCreatingUser, setIsCreatingUser] = useState(false)
   const [error, setError] = useState<string>("")
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+  const [existingUser, setExistingUser] = useState<{name: string, email: string} | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+
+  const checkEmailExists = async () => {
+    if (!email.trim() || !email.includes('@')) return
+
+    setIsCheckingEmail(true)
+    setError("")
+    setExistingUser(null)
+
+    try {
+      const response = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (data.exists) {
+        setExistingUser(data.user)
+      }
+    } catch (error) {
+      console.error('Erreur vérification email:', error)
+    } finally {
+      setIsCheckingEmail(false)
+    }
+  }
+
+  const handleNextStep = () => {
+    if (existingUser) {
+      // Rediriger vers la page de connexion
+      router.push('/login')
+    } else {
+      setStep(2)
+    }
+  }
 
   const handleComplete = async () => {
     if (name && email && gender && mode && age) {
@@ -42,7 +86,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           body: JSON.stringify({
             name,
             email,
-            password: 'temp-password-' + Date.now(), // Mot de passe temporaire
+            password: password, // Utiliser le vrai mot de passe
             profile: {
               gender,
               age: Number.parseInt(age),
@@ -93,6 +137,32 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <p className="text-muted-foreground">Commençons par quelques informations basiques</p>
             </div>
 
+            {existingUser && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Un compte existe déjà pour <strong>{existingUser.email}</strong> au nom de <strong>{existingUser.name}</strong>.
+                  <div className="mt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => router.push('/login')}
+                      className="mr-2"
+                    >
+                      Se connecter
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setExistingUser(null)}
+                    >
+                      Utiliser un autre email
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="space-y-4">
               <div>
                 <label htmlFor="name" className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
@@ -119,9 +189,40 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={checkEmailExists}
                   placeholder="exemple@email.com"
                   className="h-12"
                 />
+                {isCheckingEmail && (
+                  <p className="text-xs text-muted-foreground mt-1">Vérification de l'email...</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="password" className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
+                  Créer un mot de passe
+                </label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimum 6 caractères"
+                    className="h-12 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {password && password.length < 6 && (
+                  <p className="text-xs text-destructive mt-1">Le mot de passe doit contenir au moins 6 caractères</p>
+                )}
               </div>
 
               <p className="text-xs text-muted-foreground">
@@ -129,14 +230,28 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </p>
             </div>
 
-            <Button 
-              onClick={() => setStep(2)} 
-              disabled={!name.trim() || !email.trim() || !email.includes('@')} 
-              className="w-full" 
-              size="lg"
-            >
-              Continuer
-            </Button>
+            <div className="space-y-2">
+              <Button 
+                onClick={handleNextStep} 
+                disabled={!name.trim() || !email.trim() || !email.includes('@') || !password.trim() || password.length < 6 || isCheckingEmail} 
+                className="w-full" 
+                size="lg"
+              >
+                {existingUser ? "Se connecter" : "Continuer"}
+              </Button>
+              
+              {!existingUser && (
+                <p className="text-center text-sm text-muted-foreground">
+                  Déjà un compte ?{" "}
+                  <button 
+                    onClick={() => router.push('/login')}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Se connecter
+                  </button>
+                </p>
+              )}
+            </div>
           </Card>
         )}
 

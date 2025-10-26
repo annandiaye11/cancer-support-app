@@ -39,8 +39,9 @@ export default function Home() {
 
   useEffect(() => {
     if (userProfile) {
-      // Apply theme based on gender AFTER onboarding
+      // Apply theme based on gender AFTER onboarding or login
       document.body.className = userProfile.gender === "female" ? "theme-female" : "theme-male"
+      console.log(`Thème appliqué: ${userProfile.gender === "female" ? "féminin" : "masculin"} pour ${userProfile.name}`)
     }
   }, [userProfile])
 
